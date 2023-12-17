@@ -17,6 +17,7 @@ import { map } from 'rxjs';
 export class SideBarComponent {
   private secretsStoreService = inject(SecretsStoreService);
   private chatsService = inject(ChatService);
+  private displayService = inject(DisplayService);
   paramService = inject(ModelParamsService);
 
 
@@ -47,6 +48,7 @@ export class SideBarComponent {
 
   selectChat(chatId: string): void {
     this.chatsService.goToChat(chatId);
+    this.displayService.isSidebarVisible$.next(false);
   }
 
   deleteChat(chatId: string): void {

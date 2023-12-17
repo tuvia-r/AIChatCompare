@@ -14,6 +14,7 @@ export class ChatOutputComponent {
 
   ButtonComponent = CopyBtnComponent;
   @Input() message!: ChatMessage;
+  @Input() isLast = false;
 
   async setAsPrimary() {
     await this.chatService.setMessageAsPrimary(this.message.id);

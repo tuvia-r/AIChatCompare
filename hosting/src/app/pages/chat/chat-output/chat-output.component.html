@@ -18,6 +18,7 @@
         icon="pi pi-check"
         [text]="true"
         [disabled]="(hasPrimary$ | async) === true"
+        *ngIf="isLast"
         (click)="setAsPrimary()"
         pTooltip="Set as Primary"
       ></p-button>

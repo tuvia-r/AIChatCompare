@@ -148,6 +148,7 @@ export class ChatService {
       `chats`,
       Array.from(this.allChats$.value.entries())
     );
+    this.loadMessages();
   }
 
   async getHistory() {

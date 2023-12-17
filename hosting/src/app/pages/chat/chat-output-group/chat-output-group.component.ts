@@ -8,8 +8,11 @@ import { ChatMessageGroup } from '../../../services/message.types';
 })
 export class ChatOutputGroupComponent {
   @Input() messageGroup!: ChatMessageGroup;
+  @Input() isLast = false;
 
   activeIndex = 0;
+
+  hasPrimaryMessage = false;
 
   ngOnChanges() {
     const primaryIndex = this.messageGroup.sourceNames.findIndex(n => this.getMessage(n)?.isPrimary);
