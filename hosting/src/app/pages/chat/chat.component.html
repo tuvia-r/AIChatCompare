@@ -1,0 +1,12 @@
+<ai-chat-chat-input-bubble class="bottom-0 relative bubble"></ai-chat-chat-input-bubble>
+
+<ng-container *ngFor="let group of messageGroups$ | async">
+  <ng-container *ngIf="group.messages.length > 0">
+    @if(group.sourceType === 'user'){
+      <ai-chat-chat-input [message]="group.messages[0].text" [disabled]="true"></ai-chat-chat-input>
+    }
+    @else {
+      <ai-chat-chat-output-group [messageGroup]="group"></ai-chat-chat-output-group>
+    }
+  </ng-container>
+</ng-container>

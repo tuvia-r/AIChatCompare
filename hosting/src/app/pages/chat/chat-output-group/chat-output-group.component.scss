@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+:host ::ng-deep .p-tabview-panels {
+  padding: 0 !important;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav {
+  border: none !important;
+
+  li {
+    opacity: 0.6;
+
+    &.p-highlight {
+      opacity: 1;
+    }
+
+    .p-tabview-nav-link {
+      padding: 0.5rem !important;
+    }
+  }
+}

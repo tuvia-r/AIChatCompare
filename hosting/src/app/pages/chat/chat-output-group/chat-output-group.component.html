@@ -1,0 +1,5 @@
+<p-tabView [(activeIndex)]="activeIndex" styleClass="pt-2">
+  <p-tabPanel *ngFor="let name of messageGroup.sourceNames ?? []" [header]="name">
+    <ai-chat-chat-output *ngIf="getMessage(name) as message" [message]="message"></ai-chat-chat-output>
+  </p-tabPanel>
+</p-tabView>

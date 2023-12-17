@@ -1,0 +1,34 @@
+<div class="relative row justify-content-between align-items-center">
+  <div
+    class="row absolute w-full bottom-0 justify-content-end align-items-center absolute pointer-events-none"
+  >
+    <!-- <i pRipple class="p-3 p-button-rounded p-button-text pointer-events-auto shadow-none text-primary pi pi-upload"></i> -->
+    <p-progressSpinner
+      *ngIf="isLoading$ | async"
+      styleClass="w-4rem h-4rem"
+      strokeWidth="4"
+      fill="var(--surface-ground)"
+      animationDuration="1s"
+    ></p-progressSpinner>
+    <p-button
+      pRipple
+      class="p-3 p-button-rounded p-button-text pointer-events-auto shadow-none text-primary"
+      [text]="true"
+      icon="pi pi-send"
+      *ngIf="(isLoading$ | async) === false"
+      [disabled]="(canSubmit$ | async) === false"
+      (click)="onSend()"
+      [pTooltip]="
+        (canSubmit$ | async) === false
+          ? 'Please mark one answer as primary by clicking on the check icon above'
+          : 'Send'
+      "
+    ></p-button>
+  </div>
+  <textarea
+    [(ngModel)]="text"
+    class="pr-6 pt-4 max-h-29rem min-h-2rem w-full shadow-none overflow-y-auto bubble"
+    pInputTextarea
+    [autoResize]="true"
+  ></textarea>
+</div>

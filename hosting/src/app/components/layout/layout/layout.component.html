@@ -1,0 +1,20 @@
+<div class="column w-full">
+  <ai-chat-top-bar class="flex-shrink-1"></ai-chat-top-bar>
+  <div class="row flex-grow-1 h-full min-w-full" style="margin-top: 63px">
+    <div class="hidden sm:block w-25 h-full sticky-top sticky top-0" *ngIf="showSidebar">
+      <ai-chat-side-bar></ai-chat-side-bar>
+    </div>
+    <p-sidebar
+      class="visible sm:hidden"
+      [modal]="false"
+      [fullScreen]="true"
+      [(visible)]="showSidebar"
+      (onHide)="showSidebar = false"
+    >
+      <ai-chat-side-bar></ai-chat-side-bar>
+    </p-sidebar>
+    <div class="w-auto flex-grow-1 overflow-x-auto relative">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

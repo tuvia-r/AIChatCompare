@@ -1,0 +1,23 @@
+<div class="row justify-content-between p-2">
+  <div class="row centered gap-4">
+      <p-button
+        class="p-button-rounded p-button-text"
+        icon="pi pi-bars"
+        [text]="true"
+
+        (onClick)="showSidebar = !showSidebar"
+      ></p-button>
+      <div class="column center text-center text-2xl text-primary">
+        <span >AI Chat Compare</span>
+      </div>
+  </div>
+  <div class="row center">
+    <p-button
+      class="p-button-rounded p-button-text"
+      icon="pi pi-plus"
+      [text]="true"
+      (click)="createNewChat()"
+      pTooltip="Create New Chat"
+    ></p-button>
+  </div>
+</div>
