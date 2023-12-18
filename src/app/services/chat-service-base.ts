@@ -1,6 +1,7 @@
 import { inject } from "@angular/core";
 import { ChatService } from "./chat.service";
 import { ModelParamsService } from "./model-params.service";
+import { ChatMessage } from "../types";
 
 
 export abstract class ChatServiceBase {
@@ -12,7 +13,7 @@ export abstract class ChatServiceBase {
   }
 
   abstract startChat(): Promise<void>;
-  abstract sendMessage(): Promise<void>;
+  abstract sendMessage(): Promise<ChatMessage | undefined>;
   abstract init(): Promise<void>;
 
   abstract isAvailable(): boolean;

@@ -74,9 +74,9 @@ export class GptThreeService extends ChatServiceBase {
       outputTokens: response?.outputTokens,
     };
 
-    console.log(chatMessage);
-
 
     this.chatService.addMessage(chatMessage);
+
+    return chatMessage;
   }
 }

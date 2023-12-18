@@ -75,5 +75,7 @@ export class Gpt4Service extends ChatServiceBase {
     };
 
     this.chatService.addMessage(chatMessage);
+
+    return chatMessage;
   }
 }

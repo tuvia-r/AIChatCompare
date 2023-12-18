@@ -53,7 +53,7 @@ export class SideBarComponent {
   }
 
   hasGoogleApiKey() {
-    return this.secretsStoreService.getSecret('geminiApiKey') !== undefined;
+    return !!this.secretsStoreService.getSecret('geminiApiKey');
   }
 
   onOpenAiApiFormSubmit() {
@@ -62,7 +62,7 @@ export class SideBarComponent {
   }
 
   hasOpenAiApiKey() {
-    return this.secretsStoreService.getSecret('openAiApiKey') !== undefined;
+    return !!this.secretsStoreService.getSecret('openAiApiKey');
   }
 
   selectChat(chatId: string): void {

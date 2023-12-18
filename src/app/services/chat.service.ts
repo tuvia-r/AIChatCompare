@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { LocalDbService } from './local-db.service';
 import { ChatServiceBase } from './chat-service-base';
 import { ChatMessage, ChatMessageGroup, MessageSource } from '../types/message.types';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ import { ChatMessage, ChatMessageGroup, MessageSource } from '../types/message.t
 export class ChatService {
   private localDbService = inject(LocalDbService);
   private chatServices = new Map<string, ChatServiceBase>();
+  private toastService = inject(ToastService);
 
   readonly messages$ = new BehaviorSubject<ChatMessage[]>([]);
 
@@ -174,11 +176,29 @@ export class ChatService {
         source: MessageSource.User,
         parentMessageId: primary?.id,
       };
+
+      const enabledServices = [...this.chatServices.values()].filter(cs => cs.enabled);
+
+      if(enabledServices.length === 0) {
+        this.toastService.add({
+          summary: 'No chat services enabled',
+          detail: 'Please enable at least one chat service in the sidebar',
+          severity: 'error',
+        })
+        return;
+      }
+
       await this.addMessage(message);
-      const promises = [...this.chatServices.values()].filter(cs => cs.enabled).map((s) => s.sendMessage());
+
+      const promises = enabledServices.map((s) => s.sendMessage());
       await Promise.any(promises);
       this.waitingForFirstResponse$.next(false);
-      await Promise.all(promises);
+      const messages = await Promise.all(promises);
+
+      const newMessage = messages[0];
+      if(enabledServices.length === 1 && newMessage) {
+        this.setMessageAsPrimary(newMessage.id);
+      }
     }
     finally{
       this.isLoading$.next(false);

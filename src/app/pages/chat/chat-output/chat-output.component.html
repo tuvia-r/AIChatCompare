@@ -22,10 +22,10 @@
         icon="pi pi-check"
         [text]="true"
         [disabled]="(hasPrimary$ | async) === true"
-        *ngIf="isLast"
+        *ngIf="(isLast && (hasPrimary$ | async) === false) || message.isPrimary"
         (click)="setAsPrimary()"
         tooltipPosition="left"
-        pTooltip="Set as Primary"
+        [pTooltip]="message.isPrimary ? 'Primary message' : 'Set as Primary'"
       ></p-button>
       <p-button
         pRipple

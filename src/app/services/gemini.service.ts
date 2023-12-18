@@ -105,6 +105,8 @@ export class GeminiService extends ChatServiceBase {
     };
 
     this.chatService.addMessage(chatMessage);
+
+    return chatMessage;
   }
 
 }
