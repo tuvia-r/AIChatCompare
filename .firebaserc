@@ -1,4 +1,13 @@
 {
+  "targets": {
+    "ai-chat-compare": {
+      "hosting": {
+        "ai-chat-compare": [
+          "ai-chat-compare"
+        ]
+      }
+    }
+  },
   "projects": {
     "default": "ai-chat-compare"
   }

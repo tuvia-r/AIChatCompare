@@ -1,0 +1,52 @@
+<div class="column w-full" [class.bg-teal-50]="message.isPrimary">
+  <div class="relative w-full">
+    <div class="px-3 pb-7">
+      <markdown
+        markdown
+        clipboard
+        lineNumbers
+        [disableSanitizer]="true"
+        class="w-full border-transparent shadow-none text-400 max-w-full"
+        ngPreserveWhitespaces
+        [clipboardButtonComponent]="ButtonComponent"
+        [data]="message.text"
+      >
+    </markdown>
+    </div>
+    <div class="row w-full absolute bottom-0 justify-content-end pointer-events-none">
+      <p-button
+        pRipple
+        class="p-button-rounded p-button-text pointer-events-auto"
+        styleClass="shadow-none"
+        severity="success"
+        icon="pi pi-check"
+        [text]="true"
+        [disabled]="(hasPrimary$ | async) === true"
+        *ngIf="isLast"
+        (click)="setAsPrimary()"
+        pTooltip="Set as Primary"
+      ></p-button>
+      <p-button
+        pRipple
+        class="p-button-rounded p-button-text pointer-events-auto"
+        icon="pi pi-copy"
+        [text]="true"
+        pTooltip="Copy to Clipboard"
+        (click)="copyToClipboard()"
+        styleClass="shadow-none"
+      ></p-button>
+      <!-- <p-button
+        pRipple
+        class="p-button-rounded p-button-text pointer-events-auto shadow-none"
+        icon="pi pi-reply"
+        [text]="true"
+      ></p-button> -->
+      <!-- <p-button
+        pRipple
+        class="p-button-rounded p-button-text pointer-events-auto shadow-none"
+        icon="pi pi-undo"
+        [text]="true"
+      ></p-button> -->
+    </div>
+  </div>
+</div>

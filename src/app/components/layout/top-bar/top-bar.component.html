@@ -1,0 +1,30 @@
+<div class="row justify-content-between p-2">
+  <div class="row centered gap-4">
+      <p-button
+        class="p-button-rounded p-button-text"
+        styleClass="shadow-none"
+        icon="pi pi-bars"
+        [text]="true"
+
+        (onClick)="showSidebar = !showSidebar"
+      ></p-button>
+      <div pRipple class="row center gap-2 px-2 text-center text-2xl text-teal-300 border-round-2xl border-dotted border-1 border-black-alpha-10">
+        <span class="material-symbols-outlined">
+          neurology
+          </span>
+        <span class="material-symbols-outlined">
+          compare_arrows
+          </span>
+      </div>
+  </div>
+  <div class="row center">
+    <p-button
+      class="p-button-rounded p-button-text"
+      icon="pi pi-plus"
+      [text]="true"
+      (click)="createNewChat()"
+      pTooltip="Create New Chat"
+      styleClass="shadow-none"
+    ></p-button>
+  </div>
+</div>
