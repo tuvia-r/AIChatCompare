@@ -24,7 +24,7 @@ export class ChatComponent {
 
   async scrollToBottom() {
     await new Promise(resolve => setTimeout(resolve, 10));
-    this.anchor?.nativeElement.scrollIntoView();
+    this.anchor?.nativeElement?.scrollIntoView?.();
   }
 
   ngOnDestroy() {
