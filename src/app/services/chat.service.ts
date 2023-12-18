@@ -79,7 +79,7 @@ export class ChatService {
     })
   );
 
-  private chatId = v4();
+  readonly chatId$ = new BehaviorSubject<string>(v4());
 
   readonly allChats$ = new BehaviorSubject<Map<string, ChatMessage[]>>(
     new Map()
@@ -107,7 +107,7 @@ export class ChatService {
   }
 
   saveMessages() {
-    this.allChats$.value.set(this.chatId, this.messages$.value);
+    this.allChats$.value.set(this.chatId$.value, this.messages$.value);
     this.localDbService.set(
       `chats`,
       Array.from(this.allChats$.value.entries())
@@ -124,21 +124,21 @@ export class ChatService {
 
     this.allChats$.next(allChats);
 
-    const chat = allChats.get(this.chatId);
+    const chat = allChats.get(this.chatId$.value);
     if (chat) {
       this.messages$.next(chat);
     }
   }
 
   newChat() {
-    this.chatId = v4();
+    this.chatId$.next(v4());
     this.clearMessages();
   }
 
   goToChat(chatId: string) {
     const chat = this.allChats$.value.get(chatId);
     if (chat) {
-      this.chatId = chatId;
+      this.chatId$.next(chatId);
       this.messages$.next(chat);
     }
   }

@@ -24,6 +24,7 @@
         [disabled]="(hasPrimary$ | async) === true"
         *ngIf="isLast"
         (click)="setAsPrimary()"
+        tooltipPosition="left"
         pTooltip="Set as Primary"
       ></p-button>
       <p-button

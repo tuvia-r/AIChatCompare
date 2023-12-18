@@ -1,7 +1,7 @@
 <div class="column w-full">
   <ai-chat-top-bar class="flex-shrink-1"></ai-chat-top-bar>
-  <div class="row flex-grow-1 h-full min-w-full" style="margin-top: 63px">
-    <div class="hidden sm:block w-25 h-full sticky-top sticky top-0" *ngIf="showSidebar">
+  <div class="row flex-grow-1 h-full min-w-full">
+    <div class="hidden sm:block w-25 h-full sticky-top sticky top-0" *ngIf="showSidebar" style="padding-top: 63px">
       <ng-container *ngTemplateOutlet="sideBar"></ng-container>
     </div>
     <p-sidebar
@@ -13,7 +13,7 @@
     >
     <ng-container *ngTemplateOutlet="sideBar"></ng-container>
     </p-sidebar>
-    <div class="w-auto flex-grow-1 overflow-x-auto relative">
+    <div class="w-auto flex-grow-1 overflow-y-auto relative" style="padding-top: 63px">
       <ng-content></ng-content>
     </div>
   </div>

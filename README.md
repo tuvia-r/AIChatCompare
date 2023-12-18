@@ -1,27 +1,66 @@
-# AiChatCompare
+# AIChatCompare
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.7.
+AIChatCompare is an Angular web application developed using TypeScript. The application is designed to compare multiple Language Model (LLM) text generators. It uses the user-inputted API keys, stored in the local storage of the browser, to communicate with the respective LLM APIs. It also saves the chat history in local storage for future reference.
 
-## Development server
+The application is deployed to Google Firebase with Server-Side Rendering (SSR) and utilizes Google Cloud Platform (GCP) Cloud Functions.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+* Comparison of multiple LLM text generators
+* Persistent storage of API keys and chat history in local storage
+* Server-side rendering for improved performance
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
+## Usage
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+To use the application in a development environment, run the following command:
 
-## Running unit tests
+```
+ng serve
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+You can then access the application by navigating to `http://localhost:4200` in your browser.
 
-## Running end-to-end tests
+To build the application for a production environment, run:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```
+ng build --prod
+```
 
-## Further help
+## Firebase Deployment
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Before deployment, make sure you have the Firebase CLI installed. If not, install it using:
+
+```
+npm install -g firebase-tools
+```
+
+Login to Firebase using:
+
+```
+firebase login
+```
+
+To deploy the project to Firebase, run:
+
+```
+firebase deploy
+```
+
+## Contributing
+
+We welcome contributions to the AIChatCompare project. Please first discuss the change you wish to make via an issue before making any changes.
+
+Ensure that all PRs are small to facilitate easy reviewing.
+
+## License
+
+The AIChatCompare project is licensed under the [Apache 2.0](./LICENSE) License.
+
+## Contact
+
+If you have any questions, issues, or just want to contribute, don't hesitate to send us an email at [Website](https://tuviarumpler.web.app/welcome).
+
+## Disclaimer
+
+The use of AIChatCompare is subject to acceptance of our [terms of service](./TERMS_OF_SERVICE.md). Please use responsibly.

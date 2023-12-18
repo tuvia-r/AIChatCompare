@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
-import { map } from 'rxjs';
+import { combineLatest, map } from 'rxjs';
 
 @Component({
   selector: 'ai-chat-chat',
@@ -10,7 +10,25 @@ import { map } from 'rxjs';
 export class ChatComponent {
   private chatService = inject(ChatService);
 
+  @ViewChild('anchor') anchor?: ElementRef<HTMLDivElement>;
+
   isWaiting$ = this.chatService.waitingForFirstResponse$;
 
-  messageGroups$ = this.chatService.messageGroups$.pipe(map(messageGroups => [...messageGroups].reverse()));
+  messageGroups$ = this.chatService.messageGroups$.pipe(map(groups => [...groups].reverse()));
+
+  subscription = combineLatest([
+    this.chatService.waitingForFirstResponse$,
+    this.chatService.chatId$,
+    this.messageGroups$
+  ]).subscribe(this.scrollToBottom.bind(this));
+
+  async scrollToBottom() {
+    await new Promise(resolve => setTimeout(resolve, 10));
+    this.anchor?.nativeElement.scrollIntoView();
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
 }

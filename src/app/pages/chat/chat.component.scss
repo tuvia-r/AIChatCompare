@@ -1,7 +1,18 @@
 @import "primeflex/primeflex.scss";
 
 :host {
-  min-height: 100%;
   @include styleclass('flex flex-column-reverse w-full p-4 surface-ground gap-4 pb-3');
+  min-height: calc(100vh - 64px);
   max-width: 100vw;
+
+  overflow: auto !important;
+
+  * {
+    overflow-anchor: none;
+  }
+  .anchor {
+    overflow-anchor: auto;
+    height: 1px;
+  }
 }
+
