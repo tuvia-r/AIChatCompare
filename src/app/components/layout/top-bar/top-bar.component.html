@@ -1,23 +1,28 @@
-<div class="row justify-content-between p-2">
-  <div class="row centered gap-4">
-      <p-button
-        class="p-button-rounded p-button-text"
-        styleClass="shadow-none"
-        icon="pi pi-bars"
-        [text]="true"
-
-        (onClick)="showSidebar = !showSidebar"
-      ></p-button>
-      <div pRipple class="row center gap-2 px-2 text-center text-2xl text-teal-300 border-round-2xl border-dotted border-1 border-black-alpha-10">
-        <span class="material-symbols-outlined">
-          neurology
-          </span>
-        <span class="material-symbols-outlined">
-          compare_arrows
-          </span>
-      </div>
+<div class="row justify-content-between p-2 px-3">
+  <div class="row center gap-4">
+    <p-button
+      class="p-button-rounded p-button-text w-3rem h-3rem p-0"
+      styleClass="shadow-none w-3rem h-3rem p-0 row center"
+      [text]="true"
+      size="large"
+      (onClick)="showSidebar = !showSidebar"
+    >
+      <span
+        class="material-symbols-outlined transition-all transition-duration-400"
+        [class.rotate-90]="showSidebar"
+      >
+        compare_arrows
+      </span>
+    </p-button>
   </div>
   <div class="row center">
+    <p-button
+      class="p-button-rounded p-button-text"
+      icon="pi pi-info-circle"
+      [text]="true"
+      styleClass="shadow-none"
+      (click)="op.toggle($event)"
+    ></p-button>
     <p-button
       class="p-button-rounded p-button-text"
       icon="pi pi-plus"
@@ -28,3 +33,7 @@
     ></p-button>
   </div>
 </div>
+
+<p-overlayPanel #op>
+  <ai-chat-app-info></ai-chat-app-info>
+</p-overlayPanel>

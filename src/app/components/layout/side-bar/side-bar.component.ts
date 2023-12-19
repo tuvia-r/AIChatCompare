@@ -10,6 +10,8 @@ import { ModelParamsService } from '../../../services/model-params.service';
 import { map } from 'rxjs';
 import { v4 } from 'uuid';
 
+const WINDOW_BREAKPOINT = 575;
+
 @Component({
   selector: 'ai-chat-side-bar',
   templateUrl: './side-bar.component.html',
@@ -42,6 +44,7 @@ export class SideBarComponent {
 
   formBuilder = inject(FormBuilder);
 
+  activeChatId$ = this.chatsService.chatId$;
   allChats$ = this.chatsService.allChats$.pipe(map(chats => [...chats.entries()].reverse()), map(chats => chats.map(([id, chat]) => ({ id, label: chat[0].text.slice(0, 20) + '...' }))));
 
   openAiApiForm = this.formBuilder.control('');
@@ -67,27 +70,13 @@ export class SideBarComponent {
 
   selectChat(chatId: string): void {
     this.chatsService.goToChat(chatId);
-    this.displayService.isSidebarVisible$.next(false);
+    if(window.innerWidth < WINDOW_BREAKPOINT) {
+      this.displayService.isSidebarVisible$.next(false);
+    }
   }
 
   deleteChat(chatId: string): void {
     this.chatsService.deleteChat(chatId);
-  }
-
-  goToGithub(): void {
-    window.open('https://github.com/tuvia-r', '_blank');
-  }
-
-  goToLinkedin(): void {
-    window.open('https://www.linkedin.com/in/tuvia-rumpler-b62365104/', '_blank');
-  }
-
-  goToTwitter(): void {
-    window.open('https://twitter.com/RumplerTuvia', '_blank');
-  }
-
-  goToWebsite(): void {
-    window.open('https://tuviarumpler.web.app', '_blank');
   }
 
 }

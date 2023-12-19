@@ -15,13 +15,12 @@
     </div>
     <div class="row w-full absolute bottom-0 justify-content-end pointer-events-none">
       <p-button
-        pRipple
         class="p-button-rounded p-button-text pointer-events-auto"
         styleClass="shadow-none"
         severity="success"
         icon="pi pi-check"
         [text]="true"
-        [disabled]="(hasPrimary$ | async) === true"
+        [disabled]="message.isPrimary"
         *ngIf="(isLast && (hasPrimary$ | async) === false) || message.isPrimary"
         (click)="setAsPrimary()"
         tooltipPosition="left"

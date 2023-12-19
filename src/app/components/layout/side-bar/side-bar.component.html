@@ -1,17 +1,17 @@
 <div
-  class="column gap-4 p-4 justify-content-between text-color-secondary h-full"
+  class="column gap-4 p-2 justify-content-between text-color-secondary h-full"
 >
   <p-accordion [multiple]="true" [(activeIndex)]="activeIndexes">
-    <p-accordionTab header="Chats" class="no-padding" styleClass="p-0">
+    <p-accordionTab header="Chats" styleClass="p-0">
       <p-menu
         [model]="(allChats$ | async) ?? []"
         class="w-full h-full"
-        styleClass="border-none w-full h-full"
+        styleClass="border-none w-full h-full pl-4"
       >
         <ng-template pTemplate="item" let-item>
-          <div class="row justify-content-between align-items-center w-full">
+          <div class="row justify-content-between align-items-center w-full menu-item" [class.active-item]="(activeChatId$ | async) === item.id">
             <div
-              class="column justify-content-center flex-grow-1 p-4"
+              class="column justify-content-center flex-grow-1 p-2"
               pRipple
               (click)="selectChat(item.id)"
             >
@@ -21,6 +21,7 @@
               pRipple
               class="p-button-rounded p-button-text"
               icon="pi pi-times"
+              styleClass="shadow-none text-300 hover:text-red-700"
               [text]="true"
               (click)="
                 $event.preventDefault();
@@ -83,7 +84,7 @@
             pRipple
             class="p-button-rounded p-button-text"
             icon="pi pi-save"
-            [outlined]="true"
+            [text]="true"
             [icon]="hasOpenAiApiKey() ? 'pi pi-check' : 'pi pi-save'"
             [severity]="hasOpenAiApiKey() ? 'success' : 'primary'"
             (click)="onOpenAiApiFormSubmit()"
@@ -106,41 +107,12 @@
             class="p-button-rounded p-button-text"
             [icon]="hasGoogleApiKey() ? 'pi pi-check' : 'pi pi-save'"
             [severity]="hasGoogleApiKey() ? 'success' : 'primary'"
-            [outlined]="true"
+            [text]="true"
             (click)="onGoogleApiFormSubmit()"
           ></p-button>
         </div>
       </div>
     </p-accordionTab>
   </p-accordion>
-  <div class="row center gap-1">
-    <p-button
-      pRipple
-      class="p-button-rounded p-button-text"
-      icon="pi pi-globe"
-      [text]="true"
-      (click)="goToWebsite()"
-    ></p-button>
-    <p-button
-      pRipple
-      class="p-button-rounded p-button-text"
-      icon="pi pi-github"
-      [text]="true"
-      (click)="goToGithub()"
-    ></p-button>
-    <p-button
-      pRipple
-      class="p-button-rounded p-button-text"
-      icon="pi pi-linkedin"
-      [text]="true"
-      (click)="goToLinkedin()"
-    ></p-button>
-    <p-button
-      pRipple
-      class="p-button-rounded p-button-text"
-      icon="pi pi-twitter"
-      [text]="true"
-      (click)="goToTwitter()"
-    ></p-button>
-  </div>
+  <ai-chat-share-btns></ai-chat-share-btns>
 </div>

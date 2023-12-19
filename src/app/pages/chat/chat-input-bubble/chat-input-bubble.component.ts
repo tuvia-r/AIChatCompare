@@ -26,4 +26,11 @@ export class ChatInputBubbleComponent {
     this.text = '';
     await this.chatService.message(message);
   }
+
+  onEnter(event: KeyboardEvent) {
+    if (!event.shiftKey) {
+      event.preventDefault();
+      this.onSend();
+    }
+  }
 }

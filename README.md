@@ -61,7 +61,7 @@ The AIChatCompare project is licensed under the [Apache 2.0](./LICENSE) License.
 
 ## Contact
 
-If you have any questions, issues, or just want to contribute, don't hesitate to send us an email at [Website](https://tuviarumpler.web.app/welcome).
+If you have any questions, issues, or just want to contribute, don't hesitate to send us an message at [Website](https://tuviarumpler.web.app/welcome).
 
 ## Disclaimer
 

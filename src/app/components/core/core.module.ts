@@ -1,5 +1,5 @@
-import { Inject, NgModule } from '@angular/core';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ToastComponent } from './toast/toast.component';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
@@ -18,11 +18,17 @@ import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SkeletonModule } from 'primeng/skeleton';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ShareBtnsComponent } from './share-btns/share-btns.component';
+import { AppInfoComponent } from './app-info/app-info.component';
+
 
 
 @NgModule({
   declarations: [
-    ToastComponent
+    ToastComponent,
+    ShareBtnsComponent,
+    AppInfoComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +54,10 @@ import { SkeletonModule } from 'primeng/skeleton';
     MenuModule,
     TooltipModule,
     ProgressSpinnerModule,
-    SkeletonModule
+    SkeletonModule,
+    OverlayPanelModule,
+    ShareBtnsComponent,
+    AppInfoComponent,
   ],
   providers: [
     MessageService

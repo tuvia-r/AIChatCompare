@@ -1,17 +1,15 @@
-
 <div class="anchor" #anchor></div>
 
-
 <ai-chat-chat-input-bubble
-class="bottom-0 sticky bubble w-full"
+  class="bottom-0 sticky bubble w-full"
 ></ai-chat-chat-input-bubble>
 
-
-  <p-skeleton
-    *ngIf="isWaiting$ | async"
-    styleClass="w-full h-10rem "
-  ></p-skeleton>
-  <ng-container *ngIf="messageGroups$ | async as messageGroups">
+<p-skeleton
+  *ngIf="isWaiting$ | async"
+  styleClass="w-full h-10rem "
+></p-skeleton>
+<ng-container *ngIf="messageGroups$ | async as messageGroups">
+  <ng-container *ngIf="messageGroups.length > 0; else welcomeMessage">
     <ng-container *ngFor="let group of messageGroups; let i = index">
       <ng-container *ngIf="group.messages.length > 0">
         @if(group.sourceType === 'user'){
@@ -28,3 +26,8 @@ class="bottom-0 sticky bubble w-full"
       </ng-container>
     </ng-container>
   </ng-container>
+</ng-container>
+
+<ng-template #welcomeMessage>
+  <ai-chat-app-info></ai-chat-app-info>
+</ng-template>

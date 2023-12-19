@@ -3,3 +3,9 @@
   height: 100%;
   display: flex;
 }
+
+.main-container {
+  transition-property: width;
+  transition-duration: 0.4s;
+  transition-timing-function: ease-in-out;
+}

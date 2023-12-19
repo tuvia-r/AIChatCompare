@@ -31,5 +31,6 @@
     class="pr-6 pt-4 max-h-29rem min-h-2rem w-full shadow-none overflow-y-auto bubble"
     pInputTextarea
     [autoResize]="true"
+    (keydown.enter)="onEnter($any($event))"
   ></textarea>
 </div>

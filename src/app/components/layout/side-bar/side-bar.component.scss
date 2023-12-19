@@ -1,9 +1,46 @@
+@use 'sass:color';
+@import "primeflex/primeflex.scss";
+
 :host {
   display: block;
   height: 100%;
 }
 
 
-.no-padding ::ng-deep .p-accordion-content {
-  padding: 0 !important;
+::ng-deep .p-accordion-content {
+  border: none !important;
+  background-color: transparent !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+
+  div {
+    background-color: transparent !important;
+  }
+}
+
+::ng-deep .p-accordion-header {
+  border: none !important;
+  background-color: transparent !important;
+
+  a {
+    border: none !important;
+    background-color: transparent !important;
+  }
+
+  &.p-highlight a {
+    color: var(--primary-color) !important
+  }
+}
+
+.menu-item {
+  border-width: 1px;
+  border-style: solid;
+  border-left-width: 0.5rem !important;
+  border-color: rgba(0,0,0,.05);
+  border-left-color: rgba(0,0,0,.1);
+}
+
+.active-item {
+  border-left-color: var(--primary-color) !important;
+  border-left-width: 0.5rem !important;
 }
