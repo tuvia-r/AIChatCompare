@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 const shareText = 'Check out this awesome AI Chat Compare app!';
+const url = 'https://ai-chat-compare.web.app/chat';
 
 @Component({
   selector: 'ai-chat-share-btns',
@@ -26,31 +27,35 @@ export class ShareBtnsComponent {
   }
 
   copyLink(): void {
-    window.navigator.clipboard.writeText(window.location.href);
+    window.navigator.clipboard.writeText(url);
+  }
+
+  open(url: string): void {
+    window.open(encodeURI(url), '_blank');
   }
 
   shareOnTwitter(): void {
-    window.open(`https://twitter.com/intent/tweet?link=${window.location.href}&hashtags=AIChatCompare&text=${shareText}`, '_blank');
+    this.open(`https://twitter.com/intent/tweet?link=${url}&hashtags=AIChatCompare&text=${shareText}\n${url}\n`);
   }
 
   shareOnFacebook(): void {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${shareText}`, '_blank');
+    this.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${shareText}`);
   }
 
   shareOnWhatsapp(): void {
-    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`, '_blank');
+    this.open(`https://api.whatsapp.com/send?text=${url}`);
   }
 
   shareOnTelegram(): void {
-    window.open(`https://t.me/share/url?url=${window.location.href}&text=${shareText}`, '_blank');
+    this.open(`https://t.me/share/url?url=${url}&text=${shareText}`);
   }
 
   shareOnLinkedin(): void {
-    window.open(`https://www.linkedin.com/sharing/share-offsite?mini=true&url=${window.location.href}&title=${shareText}`, '_blank');
+    this.open(`https://www.linkedin.com/feed/?shareActive=true&&text=${shareText}\n${url}`);
   }
 
   shareOnReddit(): void {
-    window.open(`https://reddit.com/submit?url=${window.location.href}&title=${shareText}`, '_blank');
+    this.open(`https://reddit.com/submit?url=${url}&title=${shareText}`);
   }
 
 }
