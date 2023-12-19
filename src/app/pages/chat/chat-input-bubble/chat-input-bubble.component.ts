@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ChatService } from '../../../services/chat.service';
 import { take } from 'rxjs';
 import { getObservableValue } from '../../../utils/get-observable-value';
+import { WINDOW_BREAKPOINT } from '../../../utils';
 
 @Component({
   selector: 'ai-chat-chat-input-bubble',
@@ -28,7 +29,7 @@ export class ChatInputBubbleComponent {
   }
 
   onEnter(event: KeyboardEvent) {
-    if (!event.shiftKey) {
+    if (!event.shiftKey && window.innerWidth > WINDOW_BREAKPOINT) {
       event.preventDefault();
       this.onSend();
     }

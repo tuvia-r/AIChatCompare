@@ -9,8 +9,7 @@ import { ChatService } from '../../../services/chat.service';
 import { ModelParamsService } from '../../../services/model-params.service';
 import { map } from 'rxjs';
 import { v4 } from 'uuid';
-
-const WINDOW_BREAKPOINT = 575;
+import { WINDOW_BREAKPOINT } from '../../../utils';
 
 @Component({
   selector: 'ai-chat-side-bar',
