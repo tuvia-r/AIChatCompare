@@ -4,8 +4,13 @@ import { getObservableValue } from '../utils/get-observable-value';
 import { v4 } from 'uuid';
 import { LocalDbService } from './local-db.service';
 import { ChatServiceBase } from './chat-service-base';
-import { ChatMessage, ChatMessageGroup, MessageSource } from '../types/message.types';
+import {
+  ChatMessage,
+  ChatMessageGroup,
+  MessageSource,
+} from '../types/message.types';
 import { ToastService } from './toast.service';
+import { clone } from 'lodash';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +24,7 @@ export class ChatService {
 
   readonly messageGroups$ = this.messages$.pipe(
     map((messages) => {
-      if(messages.length === 0) return [];
+      if (messages.length === 0) return [];
       const groupedMessages: Record<string, ChatMessage[]> = {};
       const groupIdsOrdered: string[] = [];
       messages.forEach((message) => {
@@ -152,6 +157,9 @@ export class ChatService {
       Array.from(this.allChats$.value.entries())
     );
     this.loadMessages();
+    if (this.chatId$.value === chatId) {
+      this.newChat();
+    }
   }
 
   async getHistory() {
@@ -159,16 +167,15 @@ export class ChatService {
   }
 
   async message(content: string) {
-
     const hasPrimary = await getObservableValue(this.hasPrimary$);
 
-    if(!hasPrimary || !content) {
+    if (!hasPrimary || !content) {
       throw new Error('No primary message');
     }
 
     this.isLoading$.next(true);
     this.waitingForFirstResponse$.next(true);
-    try{
+    try {
       const primary = (await getObservableValue(this.messageChain$))?.pop();
       const message: ChatMessage = {
         id: v4(),
@@ -177,14 +184,16 @@ export class ChatService {
         parentMessageId: primary?.id,
       };
 
-      const enabledServices = [...this.chatServices.values()].filter(cs => cs.enabled);
+      const enabledServices = [...this.chatServices.values()].filter(
+        (cs) => cs.enabled
+      );
 
-      if(enabledServices.length === 0) {
+      if (enabledServices.length === 0) {
         this.toastService.add({
           summary: 'No chat services enabled',
           detail: 'Please enable at least one chat service in the sidebar',
           severity: 'error',
-        })
+        });
         return;
       }
 
@@ -196,17 +205,15 @@ export class ChatService {
       const messages = await Promise.all(promises);
 
       const newMessage = messages[0];
-      if(enabledServices.length === 1 && newMessage) {
+      if (enabledServices.length === 1 && newMessage) {
         this.setMessageAsPrimary(newMessage.id);
       }
-    }
-    finally{
+    } finally {
       this.isLoading$.next(false);
-      if(this.waitingForFirstResponse$.value) {
+      if (this.waitingForFirstResponse$.value) {
         this.waitingForFirstResponse$.next(false);
       }
     }
-
   }
 
   async setMessageAsPrimary(messageId: string) {
@@ -218,5 +225,27 @@ export class ChatService {
     message.isPrimary = true;
     this.messages$.next([...messages]);
     this.saveMessages();
+  }
+
+  async branchOutChat(fromMessageId: string) {
+    const groups = (await getObservableValue(this.messageGroups$)) ?? [];
+    const groupIndex = groups.findIndex((g) =>
+      g.messages.find((m) => m.id === fromMessageId)
+    );
+    if (groupIndex === -1) return;
+    groups[groupIndex].messages = groups[groupIndex].messages.map((m) => clone(m));
+    groups[groupIndex].messages.forEach(
+      (m) => (m.isPrimary = m.id === fromMessageId)
+    );
+    const newMessageTree = groups.slice(0, groupIndex + 1);
+    const newMessages = newMessageTree.reduce(
+      (acc, cur) => [...acc, ...cur.messages],
+      [] as ChatMessage[]
+    );
+    const newChatId = v4();
+    this.allChats$.value.set(newChatId, newMessages);
+    this.saveMessages();
+    this.loadMessages();
+    this.goToChat(newChatId);
   }
 }

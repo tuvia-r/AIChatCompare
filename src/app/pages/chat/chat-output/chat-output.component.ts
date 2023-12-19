@@ -24,4 +24,8 @@ export class ChatOutputComponent {
   copyToClipboard() {
     window.navigator.clipboard.writeText(this.message.text);
   }
+
+  onBranchClick() {
+    this.chatService.branchOutChat(this.message.id);
+  }
 }

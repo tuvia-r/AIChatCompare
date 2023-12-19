@@ -15,6 +15,22 @@
     </div>
     <div class="row w-full absolute bottom-0 justify-content-end pointer-events-none">
       <p-button
+        pRipple
+        class="p-button-rounded p-button-text pointer-events-auto"
+        [text]="true"
+        (click)="onBranchClick()"
+        styleClass="shadow-none column center px-0 w-3rem"
+        pTooltip="Branch out from this message"
+        tooltipPosition="left"
+        *ngIf="isLast ? (hasPrimary$ | async) && !message.isPrimary : !message.isPrimary"
+      >
+      <span
+        class="material-symbols-outlined text-base"
+      >
+        alt_route
+      </span>
+    </p-button>
+      <p-button
         class="p-button-rounded p-button-text pointer-events-auto"
         styleClass="shadow-none"
         severity="success"
@@ -35,12 +51,6 @@
         (click)="copyToClipboard()"
         styleClass="shadow-none"
       ></p-button>
-      <!-- <p-button
-        pRipple
-        class="p-button-rounded p-button-text pointer-events-auto shadow-none"
-        icon="pi pi-reply"
-        [text]="true"
-      ></p-button> -->
       <!-- <p-button
         pRipple
         class="p-button-rounded p-button-text pointer-events-auto shadow-none"
