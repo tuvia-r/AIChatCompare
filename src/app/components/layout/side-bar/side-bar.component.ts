@@ -7,7 +7,7 @@ import { Gpt4Service } from '../../../services/gpt-4.service';
 import { DisplayService } from '../../../services';
 import { ChatService } from '../../../services/chat.service';
 import { ModelParamsService } from '../../../services/model-params.service';
-import { map } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { v4 } from 'uuid';
 import { WINDOW_BREAKPOINT } from '../../../utils';
 
@@ -44,7 +44,7 @@ export class SideBarComponent {
   formBuilder = inject(FormBuilder);
 
   activeChatId$ = this.chatsService.chatId$;
-  allChats$ = this.chatsService.allChats$.pipe(map(chats => [...chats.entries()].reverse()), map(chats => chats.map(([id, chat]) => ({ id, label: chat[0].text.slice(0, 20) + '...' }))));
+  allChats$ = this.chatsService.allChats$.pipe(map(chats => [...chats.entries()].reverse()), map(chats => chats.map(([id, chat]) => ({ id, label: chat.title.slice(0, 20) + '...', value: chat.title }))));
 
   openAiApiForm = this.formBuilder.control('');
   googleApiForm = this.formBuilder.control('');
@@ -54,6 +54,13 @@ export class SideBarComponent {
     this.googleApiForm.setValue('');
   }
 
+  onRemoveGoogleApiKey() {
+    this.secretsStoreService.setSecret('geminiApiKey', '');
+    this.googleApiForm.setValue('');
+
+    this.geminiService.enabled = false;
+  }
+
   hasGoogleApiKey() {
     return !!this.secretsStoreService.getSecret('geminiApiKey');
   }
@@ -61,6 +68,15 @@ export class SideBarComponent {
   onOpenAiApiFormSubmit() {
     this.secretsStoreService.setSecret('openAiApiKey', this.openAiApiForm.value as string);
     this.openAiApiForm.setValue('');
+  }
+
+  onRemoveOpenAiApiKey() {
+    this.secretsStoreService.setSecret('openAiApiKey', '');
+    this.openAiApiForm.setValue('');
+
+
+    this.gpt3Service.enabled = false;
+    this.gpt4Service.enabled = false;
   }
 
   hasOpenAiApiKey() {

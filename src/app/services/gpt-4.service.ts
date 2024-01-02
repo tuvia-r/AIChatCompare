@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ChatServiceBase } from './chat-service-base';
+import { ChatServiceBase, TITLE_PROMPT } from './chat-service-base';
 import { ChatService } from './chat.service';
 import { OpenAiResponse, OpenAiService } from './open-ai.service';
 import { OpenAI } from 'openai';
@@ -74,8 +74,43 @@ export class Gpt4Service extends ChatServiceBase {
       outputTokens: response?.outputTokens,
     };
 
-    this.chatService.addMessage(chatMessage);
-
     return chatMessage;
+  }
+
+  override async createTitle(): Promise<string | undefined> {
+    if(!this.enabled) return;
+
+    const history = (await this.chatService.getHistory()) ?? [];
+    const message = history[history.length - 1];
+
+    const openAiMessages = history?.map((message) => ({
+      role: message.source === 'user' ? 'user' : 'assistant',
+      content: message.text,
+    })) as OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+
+    openAiMessages.push({
+      role: 'user',
+      content: TITLE_PROMPT,
+    });
+
+    let response: OpenAiResponse;
+
+    try {
+      response = await this.openAiService.chat(
+        this.openAiModelName,
+        openAiMessages
+      );
+    }
+    catch (error: any) {
+      console.error(error);
+      this.toastsService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error communicating with OpenAI API' + error.message,
+      })
+      return;
+    }
+
+    return response.message.content ?? '';
   }
 }

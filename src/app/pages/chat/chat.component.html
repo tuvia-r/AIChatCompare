@@ -1,33 +1,53 @@
-<div class="anchor" #anchor></div>
-
-<ai-chat-chat-input-bubble
-  class="bottom-0 sticky bubble w-full"
-></ai-chat-chat-input-bubble>
-
-<p-skeleton
-  *ngIf="isWaiting$ | async"
-  styleClass="w-full h-10rem "
-></p-skeleton>
-<ng-container *ngIf="messageGroups$ | async as messageGroups">
-  <ng-container *ngIf="messageGroups.length > 0; else welcomeMessage">
-    <ng-container *ngFor="let group of messageGroups; let i = index">
-      <ng-container *ngIf="group.messages.length > 0">
-        @if(group.sourceType === 'user'){
-        <ai-chat-chat-input
-          [message]="group.messages[0].text"
-          [disabled]="true"
-        ></ai-chat-chat-input>
-        } @else {
-        <ai-chat-chat-output-group
-          [isLast]="i === 0"
-          [messageGroup]="group"
-        ></ai-chat-chat-output-group>
-        }
+<div class="align-items-center outer-container" #container>
+  <div
+    class="main-container flex flex-column justify-content-end w-full p-4 gap-4 pb-8 overflow-y-auto"
+  >
+    <ng-container
+      *ngIf="messageGroups$ | async as messageGroups; else welcomeMessage"
+    >
+      <ng-container *ngIf="messageGroups.length > 0; else welcomeMessage">
+        <ng-container *ngFor="let group of messageGroups; let i = index">
+          <ng-container *ngIf="group.messageBySource">
+            @if(group.sourceType === 'user'){
+            <ai-chat-chat-input
+              [message]="group.messageBySource['user']?.text ?? ''"
+              [disabled]="true"
+            ></ai-chat-chat-input>
+            } @else {
+            <ai-chat-chat-output-group
+              [isLast]="i === messageGroups.length - 1"
+              [messageGroup]="group"
+            ></ai-chat-chat-output-group>
+            }
+          </ng-container>
+        </ng-container>
       </ng-container>
     </ng-container>
-  </ng-container>
-</ng-container>
 
-<ng-template #welcomeMessage>
-  <ai-chat-app-info></ai-chat-app-info>
-</ng-template>
+    <div
+      class="anchor"
+      #anchor
+      chatScrollIntoView
+      [trigger]="messageGroups$ | async"
+    ></div>
+  </div>
+  <ng-template #welcomeMessage>
+    <ai-chat-app-info></ai-chat-app-info>
+  </ng-template>
+  <div
+    [style.width.px]="container.clientWidth"
+    class="sticky-bottom flex flex-column justify-content-center align-items-center gap-2 pb-2 px-5"
+  >
+    <p-button
+      *ngIf="!isScrolledToBottom"
+      [rounded]="true"
+      [outlined]="true"
+      icon="pi pi-angle-down"
+      styleClass="shadow-none opacity-50"
+      (click)="scrollToBottom()"
+    ></p-button>
+    <ai-chat-chat-input-bubble
+      class="bubble w-10"
+    ></ai-chat-chat-input-bubble>
+  </div>
+</div>

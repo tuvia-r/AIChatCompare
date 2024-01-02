@@ -8,7 +8,7 @@ export interface ChatMessage {
   id: string;
   text: string;
   source: MessageSource;
-  sourceName?: string;
+  sourceName: string;
   parentMessageId?: string;
   isPrimary?: boolean;
   inputTokens?: number;
@@ -16,7 +16,7 @@ export interface ChatMessage {
 }
 
 export interface ChatMessageGroup {
+  id: string;
   sourceType: MessageSource;
-  messages: ChatMessage[];
-  sourceNames: string[];
+  messageBySource: Record<string, ChatMessage | undefined>;
 }

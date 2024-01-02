@@ -3,6 +3,35 @@ import { ChatService } from "./chat.service";
 import { ModelParamsService } from "./model-params.service";
 import { ChatMessage } from "../types";
 
+const escape = '```'
+
+export const TITLE_PROMPT = `
+You are a machine that only returns and replies with valid, iterable RFC8259 compliant JSON in your responses.
+Create a meaningful title for this conversation.
+
+Example:
+${escape}json
+{
+  "title": "My Awesome Conversation"
+}
+${escape}
+
+schema:
+${escape}json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Example Schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": ["title"]
+}
+${escape}
+`
+
 
 export abstract class ChatServiceBase {
   protected chatService = inject(ChatService);
@@ -14,6 +43,7 @@ export abstract class ChatServiceBase {
 
   abstract startChat(): Promise<void>;
   abstract sendMessage(): Promise<ChatMessage | undefined>;
+  abstract createTitle(): Promise<string | undefined>;
   abstract init(): Promise<void>;
 
   abstract isAvailable(): boolean;

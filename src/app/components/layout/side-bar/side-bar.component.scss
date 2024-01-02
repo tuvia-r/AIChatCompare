@@ -4,6 +4,8 @@
 :host {
   display: block;
   height: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
 
@@ -43,5 +45,10 @@
 .active-item {
   border-left-color: var(--primary-color) !important;
   border-left-width: 0.5rem !important;
+}
+
+::ng-deep .sidebar-chats {
+  max-height: calc(60vh);
+  overflow-y: auto;
 }
 

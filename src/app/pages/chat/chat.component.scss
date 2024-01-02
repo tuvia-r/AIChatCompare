@@ -1,18 +1,26 @@
 @import "primeflex/primeflex.scss";
 
-:host {
-  @include styleclass('flex flex-column-reverse w-full p-4 gap-4 pb-3');
+.outer-container {
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  position: relative;
+}
+
+.main-container {
   min-height: calc(100vh - 64px);
   max-width: 100vw;
+  overflow-y: auto;
+}
 
-  overflow: auto !important;
+.anchor {
+  width: 1px;
+  height: 1px;
+}
 
-  * {
-    overflow-anchor: none;
-  }
-  .anchor {
-    overflow-anchor: auto;
-    height: 1px;
-  }
+.sticky-bottom {
+  position: fixed;
+  bottom: 0;
+  z-index: 100;
+  width: 100%;
 }
 

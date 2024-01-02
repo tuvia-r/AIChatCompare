@@ -3,7 +3,7 @@ import { ChatSession, GenerateContentResult, GenerativeModel, GoogleGenerativeAI
 import { ChatService } from './chat.service';
 import { SecretsStoreService } from './secrets-store.service';
 import { v4 } from 'uuid';
-import { ChatServiceBase } from './chat-service-base';
+import { ChatServiceBase, TITLE_PROMPT } from './chat-service-base';
 import { ModelParamsService } from './model-params.service';
 import { ChatMessage, MessageSource } from '../types/message.types';
 import { ToastService } from './toast.service';
@@ -54,11 +54,15 @@ export class GeminiService extends ChatServiceBase {
     });
   }
 
-  async startChat() {
+  async startChat(noHistory = false) {
     if(this.enabled) {
       await this.init();
     }
-    const history = (await this.chatService.getHistory())?.slice(0, -1);
+
+    let history = (await this.chatService.getHistory()).slice(0, -1);
+    if(!noHistory) {
+      history = []
+    }
 
     this.chatInstance = this.model?.startChat({
       history: history?.map(message => ({
@@ -73,9 +77,10 @@ export class GeminiService extends ChatServiceBase {
 
 
   async sendMessage() {
-    if(!this.chatInstance || !this.enabled) {
-      await this.startChat();
+    if(!this.enabled) {
+      return;
     }
+    await this.startChat();
 
     const message = (await this.chatService.getHistory())?.pop();
 
@@ -104,9 +109,39 @@ export class GeminiService extends ChatServiceBase {
       parentMessageId: message.id,
     };
 
-    this.chatService.addMessage(chatMessage);
-
     return chatMessage;
+  }
+
+
+  async createTitle() {
+    if(!this.enabled) {
+      return;
+    }
+    await this.startChat(true);
+
+    let response: GenerateContentResult | undefined;
+    try {
+      response = await this.chatInstance?.sendMessage(
+        `
+        here is a start of a conversation:
+        '''
+        ${(await this.chatService.getHistory()).map(message => message.text).join('\n')}
+        '''
+
+        ${TITLE_PROMPT}
+        `);
+    }
+    catch (error: any) {
+      console.error(error);
+      this.toastsService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error communicating with Gemini API' + error.message,
+      })
+      return;
+    }
+
+    return response?.response.text() ?? '';
   }
 
 }

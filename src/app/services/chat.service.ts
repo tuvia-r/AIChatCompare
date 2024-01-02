@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, map } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { getObservableValue } from '../utils/get-observable-value';
 import { v4 } from 'uuid';
 import { LocalDbService } from './local-db.service';
@@ -10,7 +11,11 @@ import {
   MessageSource,
 } from '../types/message.types';
 import { ToastService } from './toast.service';
+import { Chat } from '../models/chat';
 import { clone } from 'lodash';
+import { ActiveChatService } from './active-chat.service';
+
+let numberOfServices = 0;
 
 @Injectable({
   providedIn: 'root',
@@ -19,151 +24,128 @@ export class ChatService {
   private localDbService = inject(LocalDbService);
   private chatServices = new Map<string, ChatServiceBase>();
   private toastService = inject(ToastService);
+  private activeChatService = inject(ActiveChatService);
 
-  readonly messages$ = new BehaviorSubject<ChatMessage[]>([]);
-
-  readonly messageGroups$ = this.messages$.pipe(
-    map((messages) => {
-      if (messages.length === 0) return [];
-      const groupedMessages: Record<string, ChatMessage[]> = {};
-      const groupIdsOrdered: string[] = [];
-      messages.forEach((message) => {
-        const parentId = message.parentMessageId;
-        if (!parentId) return;
-        if (!groupIdsOrdered.includes(parentId)) {
-          groupIdsOrdered.push(parentId);
-        }
-        if (!groupedMessages[parentId]) {
-          groupedMessages[parentId] = [];
-        }
-        groupedMessages[parentId].push(message);
-      });
-
-      return [
-        {
-          sourceType: MessageSource.User,
-          messages: [messages[0]],
-          sourceNames: [],
-        },
-        ...groupIdsOrdered.map((id) => ({
-          sourceType: groupedMessages[id][0].source,
-          messages: groupedMessages[id],
-          sourceNames: groupedMessages[id]
-            .map((m) => m.sourceName)
-            .filter((n) => !!n)
-            .sort(),
-        })),
-      ].filter((g) => g.messages.length > 0) as ChatMessageGroup[];
-    })
+  readonly chatId$ = this.activeChatService.activeChat$.pipe(
+    map((chat) => chat.id)
   );
-
-  readonly messageChain$ = this.messageGroups$.pipe(
-    map((messageGroups) => {
-      const messageChain: ChatMessage[] = [];
-      for (const group of messageGroups) {
-        const primary = group.messages.find(
-          (m) => m.isPrimary || m.source === MessageSource.User
-        );
-        if (primary) {
-          messageChain.push(primary);
-        }
-      }
-      return messageChain;
-    })
+  readonly messageGroups$ = this.activeChatService.activeChat$.pipe(
+    map((chat) => chat.groups)
   );
+  readonly test = new BehaviorSubject<string>('');
+
+
+  readonly allChats$ = new BehaviorSubject<Map<string, Chat>>(new Map<string, Chat>());
+
+  readonly chat$ = this.activeChatService.activeChat$;
 
   readonly hasPrimary$ = this.messageGroups$.pipe(
     map((messageGroups) => {
-      for (const group of messageGroups) {
-        const primary = group.messages.find(
-          (m) => m.isPrimary || m.source === MessageSource.User
-        );
-        if (!primary) {
-          return false;
-        }
-      }
-      return true;
+      const relevantGroup = [...messageGroups].pop();
+      if (!relevantGroup || relevantGroup.sourceType === MessageSource.User)
+        return true;
+      const hasPrimary = Object.values(relevantGroup.messageBySource).some(
+        (m) => m?.isPrimary
+      );
+      return !!hasPrimary;
     })
   );
-
-  readonly chatId$ = new BehaviorSubject<string>(v4());
-
-  readonly allChats$ = new BehaviorSubject<Map<string, ChatMessage[]>>(
-    new Map()
-  );
-
   readonly isLoading$ = new BehaviorSubject<boolean>(false);
   readonly waitingForFirstResponse$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
+
     this.loadMessages();
+
+    this.messageGroups$.subscribe((chat) => {
+      this.saveMessages();
+    });
+
+    console.log('Number of services', numberOfServices);
   }
 
   registerChatService(name: string, chatService: ChatServiceBase) {
     this.chatServices.set(chatService.modelName, chatService);
   }
 
-  async addMessage(message: ChatMessage) {
-    this.messages$.next([...this.messages$.value, message]);
-    this.saveMessages();
-    this.loadMessages();
+  async addGroup(group: ChatMessageGroup) {
+    this.chat$.value.addGroup(group);
+    this.chat$.next(this.chat$.value.clone());
   }
 
-  clearMessages() {
-    this.messages$.next([]);
+  async addMessage(message: ChatMessage, groupId?: string) {
+    this.chat$.value.addMessage(message, groupId);
+    this.chat$.next(this.chat$.value.clone());
   }
 
-  saveMessages() {
-    this.allChats$.value.set(this.chatId$.value, this.messages$.value);
-    this.localDbService.set(
-      `chats`,
-      Array.from(this.allChats$.value.entries())
-    );
+  async saveMessages() {
+    const chat = this.chat$.value;
+    if(chat) {
+      this.allChats$.value.set(chat.id, chat);
+      this.allChats$.next(new Map(this.allChats$.value));
+    }
+    const allChats = new Map(this.allChats$.value);
+
+    for (const chat of allChats.values()) {
+      if (chat.groups.length === 0) {
+        allChats.delete(chat.id);
+      }
+    }
+
+    this.localDbService.set(`chats`, Array.from(allChats.values()));
   }
 
   loadMessages() {
-    const messages = this.localDbService.get<[string, ChatMessage[]]>(`chats`);
-    if (!messages || !Array.isArray(messages)) return;
-    const allChats = new Map();
-    messages.forEach(([id, messages]) => {
-      allChats.set(id as string, messages as any as ChatMessage[]);
-    });
+    const currentChatId = this.chat$.value.id;
+    try {
+      const chats = this.localDbService.get<Chat[]>(`chats`)?.map(c => Chat.fromJson(c));
+      if (!chats || !Array.isArray(chats)) return;
+      const allChats = new Map<string, Chat>();
+      for (const chat of chats) {
+        allChats.set(chat.id, chat);
+      }
 
-    this.allChats$.next(allChats);
+      [...this.allChats$.value.entries()].map(([key, value]) => allChats.set(key, value));
 
-    const chat = allChats.get(this.chatId$.value);
-    if (chat) {
-      this.messages$.next(chat);
+      this.allChats$.next(allChats);
+
+      const chat = allChats.get(currentChatId);
+      if (chat) {
+        this.chat$.next(chat);
+      }
+    }
+    catch (error: any) {
+      this.saveMessages();
     }
   }
 
   newChat() {
-    this.chatId$.next(v4());
-    this.clearMessages();
+    this.chat$.next(new Chat());
   }
 
   goToChat(chatId: string) {
+    this.loadMessages();
     const chat = this.allChats$.value.get(chatId);
     if (chat) {
-      this.chatId$.next(chatId);
-      this.messages$.next(chat);
+      this.chat$.next(chat);
     }
   }
 
   deleteChat(chatId: string) {
     this.allChats$.value.delete(chatId);
+    this.allChats$.next(new Map(this.allChats$.value));
     this.localDbService.set(
       `chats`,
       Array.from(this.allChats$.value.entries())
     );
-    this.loadMessages();
-    if (this.chatId$.value === chatId) {
+    if (this.chat$.value.id === chatId) {
       this.newChat();
     }
   }
 
   async getHistory() {
-    return getObservableValue(this.messageChain$);
+    const chat = this.chat$.value;
+    return chat?.getPrimaryTree() ?? [];
   }
 
   async message(content: string) {
@@ -175,12 +157,14 @@ export class ChatService {
 
     this.isLoading$.next(true);
     this.waitingForFirstResponse$.next(true);
+
     try {
-      const primary = (await getObservableValue(this.messageChain$))?.pop();
-      const message: ChatMessage = {
+      const primary = await this.getHistory().then((h) => h.pop());
+      const userMessage: ChatMessage = {
         id: v4(),
         text: content,
         source: MessageSource.User,
+        sourceName: MessageSource.User,
         parentMessageId: primary?.id,
       };
 
@@ -197,9 +181,27 @@ export class ChatService {
         return;
       }
 
-      await this.addMessage(message);
+      await this.addMessage(userMessage);
 
-      const promises = enabledServices.map((s) => s.sendMessage());
+      const newGroup: ChatMessageGroup = {
+        id: v4(),
+        sourceType: MessageSource.Bot,
+        messageBySource: enabledServices.reduce((acc, cs) => {
+          acc[cs.modelName] = undefined;
+          return acc;
+        }, {} as Record<string, ChatMessage | undefined>),
+      };
+
+      await this.addGroup(newGroup);
+
+      const promises = enabledServices.map((s) =>
+        s.sendMessage().then(async(m) => {
+          if (m) {
+            await this.addMessage(m, newGroup.id);
+          }
+          return m;
+        })
+      );
       await Promise.any(promises);
       this.waitingForFirstResponse$.next(false);
       const messages = await Promise.all(promises);
@@ -213,39 +215,75 @@ export class ChatService {
       if (this.waitingForFirstResponse$.value) {
         this.waitingForFirstResponse$.next(false);
       }
+
+      if(this.chat$.value.title === new Chat().title) {
+        const title = await this.createTitle();
+        if(title) {
+          this.chat$.value.title = title;
+          this.chat$.next(this.chat$.value.clone());
+        }
+      }
+
     }
+  }
+
+  async createTitle(): Promise<string | undefined> {
+    const enabledServices = [...this.chatServices.values()].filter(
+      (cs) => cs.enabled
+    );
+    for (const service of enabledServices) {
+      const title = await service.createTitle();
+      if (title) {
+        try {
+          return parseJson(title).title;
+        }
+        catch(error: any) {
+          continue;
+        }
+      }
+    }
+
+    return undefined;
   }
 
   async setMessageAsPrimary(messageId: string) {
     const hasPrimary = await getObservableValue(this.hasPrimary$);
     if (hasPrimary) return;
-    const messages = this.messages$.value;
-    const message = messages.find((m) => m.id === messageId);
-    if (!message) return;
-    message.isPrimary = true;
-    this.messages$.next([...messages]);
-    this.saveMessages();
+
+    const chat = this.chat$.value;
+
+    for (const group of chat?.groups ?? []) {
+      for (const message of Object.values(group.messageBySource)) {
+        if (message?.id === messageId) {
+          message.isPrimary = true;
+          break;
+        }
+      }
+    }
+
+    this.chat$.value.groups = chat?.groups ?? [];
+
+    this.chat$.next(this.chat$.value.clone());
   }
 
   async branchOutChat(fromMessageId: string) {
-    const groups = (await getObservableValue(this.messageGroups$)) ?? [];
-    const groupIndex = groups.findIndex((g) =>
-      g.messages.find((m) => m.id === fromMessageId)
-    );
-    if (groupIndex === -1) return;
-    groups[groupIndex].messages = groups[groupIndex].messages.map((m) => clone(m));
-    groups[groupIndex].messages.forEach(
-      (m) => (m.isPrimary = m.id === fromMessageId)
-    );
-    const newMessageTree = groups.slice(0, groupIndex + 1);
-    const newMessages = newMessageTree.reduce(
-      (acc, cur) => [...acc, ...cur.messages],
-      [] as ChatMessage[]
-    );
-    const newChatId = v4();
-    this.allChats$.value.set(newChatId, newMessages);
-    this.saveMessages();
-    this.loadMessages();
-    this.goToChat(newChatId);
+    const chat = this.chat$.value;
+    if(!chat) return;
+    const newChat: Chat = chat.branchOut(fromMessageId);
+    this.allChats$.value.set(newChat.id, newChat);
+    this.allChats$.next(new Map(this.allChats$.value));
+    this.goToChat(newChat.id);
   }
 }
+
+
+
+export const parseJson = (json: string) => {
+  if (json.startsWith('```')) {
+      json = json.split('\n').slice(1, -1).join('\n');
+  }
+  if (json.startsWith('`')) {
+      json = json.slice(1, -1);
+  }
+  return JSON.parse(json);
+};

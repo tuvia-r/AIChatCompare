@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ChatService } from '../../../services/chat.service';
-import { take } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { getObservableValue } from '../../../utils/get-observable-value';
 import { WINDOW_BREAKPOINT } from '../../../utils';
 

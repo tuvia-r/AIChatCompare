@@ -1,4 +1,4 @@
-<div class="relative row justify-content-between align-items-center">
+<div class="relative row justify-content-between align-items-center" *ngIf="!(isLoading$ | async); else loading">
   <div
     class="row absolute w-full bottom-0 justify-content-end align-items-center absolute pointer-events-none"
   >
@@ -34,3 +34,7 @@
     (keydown.enter)="onEnter($any($event))"
   ></textarea>
 </div>
+
+<ng-template #loading>
+
+</ng-template>

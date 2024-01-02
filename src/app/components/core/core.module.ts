@@ -21,6 +21,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ShareBtnsComponent } from './share-btns/share-btns.component';
 import { AppInfoComponent } from './app-info/app-info.component';
+import { CollapsableComponent } from './collapsable.component';
+import { SharedModule } from '../../shared/shared.module';
 
 
 
@@ -28,7 +30,8 @@ import { AppInfoComponent } from './app-info/app-info.component';
   declarations: [
     ToastComponent,
     ShareBtnsComponent,
-    AppInfoComponent
+    AppInfoComponent,
+    CollapsableComponent,
   ],
   imports: [
     CommonModule,
@@ -37,6 +40,7 @@ import { AppInfoComponent } from './app-info/app-info.component';
     RippleModule,
     FormsModule,
     MarkdownModule.forRoot(),
+    SharedModule,
   ],
   exports: [
     ToastComponent,
@@ -58,6 +62,7 @@ import { AppInfoComponent } from './app-info/app-info.component';
     OverlayPanelModule,
     ShareBtnsComponent,
     AppInfoComponent,
+    CollapsableComponent,
   ],
   providers: [
     MessageService

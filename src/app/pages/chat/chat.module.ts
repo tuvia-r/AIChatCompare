@@ -11,6 +11,7 @@ import { CopyBtnComponent } from './chat-output/copy-btn/copy-btn.component';
 import { TabViewModule } from 'primeng/tabview';
 import { ChatOutputGroupComponent } from './chat-output-group/chat-output-group.component';
 import { ChatInputBubbleComponent } from './chat-input-bubble/chat-input-bubble.component';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { ChatInputBubbleComponent } from './chat-input-bubble/chat-input-bubble.
     CoreModule,
     MarkdownModule.forChild(),
     TabViewModule,
+    SharedModule,
   ],
 })
 export class ChatModule {}

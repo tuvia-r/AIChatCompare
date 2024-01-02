@@ -1,58 +1,60 @@
 <div
   class="column gap-4 p-2 justify-content-between text-color-secondary h-full"
 >
-  <p-accordion [multiple]="true" [(activeIndex)]="activeIndexes">
-    <p-accordionTab header="Chats" styleClass="p-0">
-      <p-menu
-        [model]="(allChats$ | async) ?? []"
-        class="w-full h-full"
-        styleClass="border-none w-full h-full pl-4"
-      >
-        <ng-template pTemplate="item" let-item>
-          <div class="row justify-content-between align-items-center w-full h-3rem menu-item" [class.active-item]="(activeChatId$ | async) === item.id">
-            <div
-              class="column justify-content-center flex-grow-1 p-2"
-              pRipple
-              (click)="selectChat(item.id)"
-            >
-              <span class="font-bold">{{ item.label }}</span>
-            </div>
-            <p-button
-              pRipple
-              class="p-button-rounded p-button-text"
-              icon="pi pi-times"
-              size="small"
-              styleClass="shadow-none text-300 hover:text-red-700"
-              [text]="true"
-              (click)="
-                $event.preventDefault();
-                $event.stopPropagation();
-                deleteChat(item.id)
-              "
-            ></p-button>
-          </div>
-        </ng-template>
-      </p-menu>
-    </p-accordionTab>
-
-    <p-accordionTab header="Chat Settings">
-      <div class="column gap-4 pl-3">
+  <div class="column gap-1">
+    <ai-chat-collapsable title="Chats" styleClass="p-0" containerClass="sidebar-chats">
+      <li class="pb-1" *ngFor="let item of allChats$ | async">
         <div
-          *ngFor="let apiService of allChatApis"
-          class="row justify-content-between align-items-center"
+          class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700 hover:surface-200 transition-duration-150 transition-colors p-ripple"
+          [class.surface-200]="(activeChatId$ | async) === item.id"
+        >
+          <div
+            class="column justify-content-center flex-grow-1 p-2"
+            pRipple
+            (click)="selectChat(item.id)"
+            [pTooltip]="item.value"
+          >
+            <span class="font-bold">{{ item.label }}</span>
+          </div>
+          <p-button
+            pRipple
+            class="p-button-rounded p-button-text"
+            icon="pi pi-times"
+            size="small"
+            styleClass="shadow-none text-300 hover:text-red-700"
+            [text]="true"
+            (click)="
+              $event.preventDefault();
+              $event.stopPropagation();
+              deleteChat(item.id)
+            "
+          ></p-button>
+        </div>
+      </li>
+    </ai-chat-collapsable>
+
+    <ai-chat-collapsable title="Chat Settings">
+      <li *ngFor="let apiService of allChatApis">
+        <div
+          class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700"
           [class.opacity-60]="apiService.isAvailable() !== true"
           [pTooltip]="
             apiService.isAvailable() !== true
               ? 'Add API key to enable this API'
-              : ''"
+              : ''
+          "
         >
-          <span class="font-bold" >{{ apiService.modelName }}</span>
+          <span class="font-bold">{{ apiService.modelName }}</span>
           <p-inputSwitch
             [disabled]="apiService.isAvailable() !== true"
             [(ngModel)]="apiService.enabled"
           ></p-inputSwitch>
         </div>
-        <div class="row justify-content-between align-items-center">
+      </li>
+      <li>
+        <div
+          class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700"
+        >
           <span class="font-bold">Temp</span>
           <p-slider
             class="w-6"
@@ -63,56 +65,95 @@
           ></p-slider>
           <span class="font-bold">{{ paramService.temperature }}</span>
         </div>
-      </div>
-    </p-accordionTab>
+      </li>
+    </ai-chat-collapsable>
 
-    <p-accordionTab header="API Keys" pTooltip="Secrets will be stored on you device (localStorage), and will not be shared with anyone">
-      <div class="column gap-4 pl-3">
-        <div class="row justify-content-between align-items-center gap-1 md:gap-4 overflow-x-auto">
-          <span class="p-float-label w-8">
-            <input
-              pInputText
-              type="password"
-              [id]="'openAiKey' + id"
-              class="w-full"
-              [formControl]="openAiApiForm"
-            />
-            <label [for]="'openAiKey' + id" class="font-bold">OpenAI</label>
-          </span>
-          <p-button
+    <ai-chat-collapsable
+      title="API Keys"
+      pTooltip="Secrets will be stored on you device (localStorage), and will not be shared with anyone"
+    >
+      <li class="pb-1">
+          <div
+            class="row justify-content-between align-items-center gap-1 md:gap-4 overflow-x-auto"
+          >
+            <span class="p-float-label w-8" *ngIf="!hasOpenAiApiKey(); else OpenAiTitle">
+              <input
+                pInputText
+                type="password"
+                [id]="'openAiKey' + id"
+                class="w-full"
+                [formControl]="openAiApiForm"
+              />
+              <label [for]="'openAiKey' + id" class="font-bold">OpenAI</label>
+            </span>
+            <ng-template #OpenAiTitle>
+              <div class="flex align-items-center gap-2">
+                <p-button
+                  pRipple
+                  class="p-button-rounded p-button-text"
+                  icon="pi pi-times"
+                  severity="danger"
+                  [text]="true"
+                  (click)="onRemoveOpenAiApiKey()"
+                ></p-button>
+
+                <span class="font-bold">OpenAI</span>
+              </div>
+            </ng-template>
+            <p-button
             [disabled]="openAiApiForm.pristine || openAiApiForm.invalid"
-            pRipple
-            class="p-button-rounded p-button-text"
-            icon="pi pi-save"
-            [text]="true"
-            [icon]="hasOpenAiApiKey() ? 'pi pi-check' : 'pi pi-save'"
-            [severity]="hasOpenAiApiKey() ? 'success' : 'primary'"
-            (click)="onOpenAiApiFormSubmit()"
-          ></p-button>
-        </div>
-        <div class="row justify-content-between align-items-center">
-          <span class="p-float-label w-8">
-            <input
-              pInputText
-              type="password"
-              [id]="'googleAiKey' + id"
-              class="w-full"
-              [formControl]="googleApiForm"
-            />
-            <label [for]="'googleAiKey' + id" class="font-bold">Google Gemini</label>
-          </span>
-          <p-button
-            [disabled]="googleApiForm.pristine || googleApiForm.invalid"
-            pRipple
-            class="p-button-rounded p-button-text"
-            [icon]="hasGoogleApiKey() ? 'pi pi-check' : 'pi pi-save'"
-            [severity]="hasGoogleApiKey() ? 'success' : 'primary'"
-            [text]="true"
-            (click)="onGoogleApiFormSubmit()"
-          ></p-button>
-        </div>
-      </div>
-    </p-accordionTab>
-  </p-accordion>
+              pRipple
+              class="p-button-rounded p-button-text"
+              icon="pi pi-save"
+              [text]="true"
+              [icon]="hasOpenAiApiKey() ? 'pi pi-check' : 'pi pi-save'"
+              [severity]="hasOpenAiApiKey() ? 'success' : 'primary'"
+              (click)="onOpenAiApiFormSubmit()"
+            ></p-button>
+          </div>
+      </li>
+      <li>
+          <div class="row justify-content-between align-items-center">
+            <span class="p-float-label w-8" *ngIf="!hasGoogleApiKey(); else GeminiTitle">
+              <input
+                pInputText
+                type="password"
+                [id]="'googleAiKey' + id"
+                class="w-full"
+                [formControl]="googleApiForm"
+              />
+              <label [for]="'googleAiKey' + id" class="font-bold"
+                >Google Gemini</label
+              >
+            </span>
+            <ng-template #GeminiTitle>
+              <div class="flex align-items-center gap-2">
+                <p-button
+                  pRipple
+                  class="p-button-rounded p-button-text"
+                  icon="pi pi-times"
+                  severity="danger"
+                  [text]="true"
+                  (click)="onRemoveGoogleApiKey()"
+                ></p-button>
+
+                <span class="font-bold">Google Gemini</span>
+              </div>
+            </ng-template>
+            <p-button
+              [disabled]="googleApiForm.pristine || googleApiForm.invalid"
+              pRipple
+              class="p-button-rounded p-button-text"
+              [icon]="hasGoogleApiKey() ? 'pi pi-check' : 'pi pi-save'"
+              [severity]="hasGoogleApiKey() ? 'success' : 'primary'"
+              [text]="true"
+              (click)="onGoogleApiFormSubmit()"
+            ></p-button>
+          </div>
+      </li>
+    </ai-chat-collapsable>
+  </div>
   <ai-chat-share-btns></ai-chat-share-btns>
 </div>
+
+
