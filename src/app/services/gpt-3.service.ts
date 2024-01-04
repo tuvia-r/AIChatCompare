@@ -16,11 +16,15 @@ export class GptThreeService extends ChatServiceBase {
   private toastsService = inject(ToastService);
 
   readonly modelName = 'GPT 3.5';
+  readonly link = 'https://openai.com/blog/gpt-3-apps';
 
   private readonly openAiModelName = 'gpt-3.5-turbo';
 
-  constructor() {
-    super();
+  constructor(
+    chatService: ChatService,
+    paramsService: ModelParamsService
+  ) {
+    super(chatService, paramsService);
     this.register();
   }
 

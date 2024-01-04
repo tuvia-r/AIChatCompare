@@ -16,7 +16,19 @@
       </span>
     </p-button>
   </div>
-  <div class="row center">
+  <div class="row center gap-2">
+    <ng-container *ngIf="chatServices$ | async as chatServices">
+      <chat-dropdown-select
+      [items]="chatServices"
+      labelName="modelName"
+      selectionName="enabled"
+      disabledName="isAvailable"
+      filterPlaceHolder="Search Selected And Hugging Face Models"
+      class="pr-1"
+      (onFilter)="onChatServiceFilter($event)"
+      (selectedChanges)="onChatServiceChange($event)"
+      ></chat-dropdown-select>
+    </ng-container>
     <p-button
       class="p-button-rounded p-button-text"
       icon="pi pi-info-circle"

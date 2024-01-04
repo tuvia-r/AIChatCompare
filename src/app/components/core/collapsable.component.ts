@@ -10,7 +10,7 @@ import { Component, Input } from '@angular/core';
       enterActiveClass="slidedown"
       leaveToClass="hidden"
       leaveActiveClass="slideup"
-      class="flex align-items-center justify-content-between cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple {{ headerStyleClass }}"
+      class="flex align-items-center justify-content-between cursor-pointer p-3 border-round text-700 surface-100 hover:surface-200 transition-duration-150 transition-colors p-ripple {{ headerStyleClass }}"
     >
       <span class="font-medium">{{ title }}</span>
       <i class="pi pi-chevron-down"></i>

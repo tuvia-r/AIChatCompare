@@ -1,22 +1,36 @@
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ComponentRef,
+  ElementRef,
+  Host,
+  HostListener,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { ChatService } from '../../services/chat.service';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, Subject, combineLatest, map, takeUntil } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
+import { ChatServiceBase } from '../../services/chat-service-base';
+import { HuggingFaceApiService } from '../../services/hugging-face-api.service';
+import { Listbox, ListboxChangeEvent } from 'primeng/listbox';
 
 @Component({
   selector: 'ai-chat-chat',
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss'
+  styleUrl: './chat.component.scss',
 })
 export class ChatComponent {
   private chatService = inject(ChatService);
   private document = inject(DOCUMENT);
+  private huggingFaceService = inject(HuggingFaceApiService);
 
   get window() {
     return this.document.defaultView;
   }
 
   @ViewChild('anchor') anchor?: ElementRef<HTMLDivElement>;
+  @ViewChild('container') container?: ElementRef<HTMLDivElement>;
+  @ViewChild('chatServicesListbox') chatServicesListbox?: ComponentRef<Listbox>;
 
   isWaiting$ = this.chatService.waitingForFirstResponse$;
   isLoading$ = this.chatService.isLoading$;
@@ -24,9 +38,16 @@ export class ChatComponent {
   messageGroups$ = this.chatService.messageGroups$;
 
   isScrolledToBottom: boolean = true;
+  containerWidth = this.document?.defaultView?.innerWidth;
+
+  chatServices$ = this.chatService.allChatServices$;
+
+  selectedChatServices = [] as ChatServiceBase[];
+
+  unsubscribe = new Subject<void>();
 
   ngAfterViewInit() {
-    if(!this.window?.IntersectionObserver){
+    if (!this.window?.IntersectionObserver) {
       return;
     }
     const intersectionObserver = new IntersectionObserver(
@@ -41,13 +62,29 @@ export class ChatComponent {
     );
 
     intersectionObserver.observe(this.anchor?.nativeElement!);
-    }
 
+    const resizeObserver = new ResizeObserver((entries) => {
+      this.containerWidth = entries[0].contentRect.width;
+    });
 
+    resizeObserver.observe(this.container?.nativeElement!);
+  }
 
+  setSelectedChatServices(services: ChatServiceBase[], currentServices: (ChatServiceBase & any)[]) {
+    currentServices.forEach((service) => {
+      service.enabled = !service.enabled;
+    });
+    const value = services.filter((service) => service.enabled);
+    this.chatService.setSelectedChatServices(value);
+  }
 
   async scrollToBottom() {
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10));
     this.anchor?.nativeElement?.scrollIntoView?.({ behavior: 'smooth' });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 }

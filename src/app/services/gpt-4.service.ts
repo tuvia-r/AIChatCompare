@@ -17,11 +17,15 @@ export class Gpt4Service extends ChatServiceBase {
 
 
   readonly modelName = 'GPT 4';
+  readonly link = 'https://openai.com/blog/gpt-4-apps';
 
   private readonly openAiModelName = 'gpt-4';
 
-  constructor() {
-    super();
+  constructor(
+    chatService: ChatService,
+    paramsService: ModelParamsService
+  ) {
+    super(chatService, paramsService);
     this.register();
   }
 

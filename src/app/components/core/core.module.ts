@@ -23,6 +23,7 @@ import { ShareBtnsComponent } from './share-btns/share-btns.component';
 import { AppInfoComponent } from './app-info/app-info.component';
 import { CollapsableComponent } from './collapsable.component';
 import { SharedModule } from '../../shared/shared.module';
+import { DropdownSelectComponent } from './dropdown-select.component';
 
 
 
@@ -32,6 +33,7 @@ import { SharedModule } from '../../shared/shared.module';
     ShareBtnsComponent,
     AppInfoComponent,
     CollapsableComponent,
+    DropdownSelectComponent,
   ],
   imports: [
     CommonModule,
@@ -63,6 +65,7 @@ import { SharedModule } from '../../shared/shared.module';
     ShareBtnsComponent,
     AppInfoComponent,
     CollapsableComponent,
+    DropdownSelectComponent
   ],
   providers: [
     MessageService

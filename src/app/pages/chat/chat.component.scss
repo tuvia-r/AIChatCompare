@@ -21,6 +21,29 @@
   position: fixed;
   bottom: 0;
   z-index: 100;
-  width: 100%;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+::ng-deep .overlay-child-p-0 .p-overlaypanel-content {
+  padding: 0 !important;
+}
+
+::ng-deep .overlay-child-p-0 .p-overlaypanel-content:before {
+  content: none !important;
+  display: none !important;
+}
+
+.no-scroll-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scroll-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 

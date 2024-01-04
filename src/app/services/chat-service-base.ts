@@ -34,8 +34,11 @@ ${escape}
 
 
 export abstract class ChatServiceBase {
-  protected chatService = inject(ChatService);
-  protected paramsService = inject(ModelParamsService);
+
+  constructor(
+    protected chatService: ChatService,
+    protected paramsService: ModelParamsService
+  ) {}
 
   protected register() {
     this.chatService.registerChatService(this.modelName, this);
@@ -49,6 +52,7 @@ export abstract class ChatServiceBase {
   abstract isAvailable(): boolean;
 
   abstract readonly modelName: string;
+  abstract readonly link: string;
 
 
   get enabled() {

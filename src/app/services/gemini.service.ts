@@ -21,9 +21,13 @@ export class GeminiService extends ChatServiceBase {
 
   readonly modelName = 'Gemini';
 
+  readonly link = 'https://deepmind.google/technologies/gemini/#introduction';
 
-  constructor() {
-    super();
+  constructor(
+    chatService: ChatService,
+    paramsService: ModelParamsService
+  ) {
+    super(chatService, paramsService);
     this.register();
   }
 

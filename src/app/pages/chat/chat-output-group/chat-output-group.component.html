@@ -1,9 +1,22 @@
-<p-tabView [(activeIndex)]="activeIndex" styleClass="pt-2">
-  <p-tabPanel *ngFor="let item of messageGroupArray" [header]="item.sourceName">
+<p-tabView [(activeIndex)]="activeIndex" styleClass="pt-2 shadow-1">
+  <p-tabPanel *ngFor="let item of messageGroupArray">
+    <ng-template pTemplate="header">
+      <div class="flex justify-content-center align-items-center px-2">
+        <p-progressSpinner
+          *ngIf="!item.id"
+          styleClass="w-1rem h-1rem"
+          strokeWidth="3"
+          animationDuration="1s"
+        ></p-progressSpinner>
+      </div>
+      <span [class.text-red-500]="item.error" class="white-space-nowrap">{{item.sourceName}}</span>
+    </ng-template>
+    <div class="w-full p-3">
+      <p-skeleton
+        *ngIf="!item.id"
+        styleClass="w-full h-2rem"
+      ></p-skeleton>
+    </div>
     <ai-chat-chat-output [isLast]="isLast" [message]="item"></ai-chat-chat-output>
-    <p-skeleton
-      *ngIf="!item.text"
-      styleClass="w-full h-2rem"
-    ></p-skeleton>
   </p-tabPanel>
 </p-tabView>

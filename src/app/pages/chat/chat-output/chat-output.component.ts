@@ -2,6 +2,7 @@ import { Component, Input, inject } from '@angular/core';
 import { CopyBtnComponent } from './copy-btn/copy-btn.component';
 import { ChatService } from '../../../services/chat.service';
 import { ChatMessage } from '../../../types/message.types';
+import { ActiveChatService } from '../../../services/active-chat.service';
 
 @Component({
   selector: 'ai-chat-chat-output',
@@ -11,6 +12,7 @@ import { ChatMessage } from '../../../types/message.types';
 })
 export class ChatOutputComponent {
   private chatService = inject(ChatService);
+  private activeChatService = inject(ActiveChatService);
   hasPrimary$ = this.chatService.hasPrimary$;
 
   ButtonComponent = CopyBtnComponent;
@@ -18,7 +20,7 @@ export class ChatOutputComponent {
   @Input() isLast = false;
 
   async setAsPrimary() {
-    await this.chatService.setMessageAsPrimary(this.message.id);
+    await this.activeChatService.setMessageAsPrimary(this.message.id);
   }
 
   copyToClipboard() {

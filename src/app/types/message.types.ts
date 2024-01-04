@@ -13,6 +13,8 @@ export interface ChatMessage {
   isPrimary?: boolean;
   inputTokens?: number;
   outputTokens?: number;
+  warnings?: string[];
+  error?: string;
 }
 
 export interface ChatMessageGroup {

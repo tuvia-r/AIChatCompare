@@ -2,7 +2,7 @@
   class="column gap-4 p-2 justify-content-between text-color-secondary h-full"
 >
   <div class="column gap-1">
-    <ai-chat-collapsable title="Chats" styleClass="p-0" containerClass="sidebar-chats">
+    <ai-chat-collapsable title="Chats" containerClass="sidebar-chats py-2">
       <li class="pb-1" *ngFor="let item of allChats$ | async">
         <div
           class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700 hover:surface-200 transition-duration-150 transition-colors p-ripple"
@@ -33,24 +33,8 @@
       </li>
     </ai-chat-collapsable>
 
-    <ai-chat-collapsable title="Chat Settings">
-      <li *ngFor="let apiService of allChatApis">
-        <div
-          class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700"
-          [class.opacity-60]="apiService.isAvailable() !== true"
-          [pTooltip]="
-            apiService.isAvailable() !== true
-              ? 'Add API key to enable this API'
-              : ''
-          "
-        >
-          <span class="font-bold">{{ apiService.modelName }}</span>
-          <p-inputSwitch
-            [disabled]="apiService.isAvailable() !== true"
-            [(ngModel)]="apiService.enabled"
-          ></p-inputSwitch>
-        </div>
-      </li>
+    <ai-chat-collapsable title="Chat Settings" containerClass="py-2 pr-3">
+
       <li>
         <div
           class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700"
@@ -69,6 +53,7 @@
     </ai-chat-collapsable>
 
     <ai-chat-collapsable
+      containerClass="py-2 pr-3"
       title="API Keys"
       pTooltip="Secrets will be stored on you device (localStorage), and will not be shared with anyone"
     >
@@ -151,6 +136,45 @@
             ></p-button>
           </div>
       </li>
+      <li>
+        <div class="row justify-content-between align-items-center">
+          <span class="p-float-label w-8" *ngIf="!hasHuggingFaceApiKey(); else HuggingFaceTitle">
+            <input
+              pInputText
+              type="password"
+              [id]="'HuggingFaceApiKey' + id"
+              class="w-full"
+              [formControl]="huggingFaceApiForm"
+            />
+            <label [for]="'HuggingFaceApiKey' + id" class="font-bold"
+              >Hugging Face</label
+            >
+          </span>
+          <ng-template #HuggingFaceTitle>
+            <div class="flex align-items-center gap-2">
+              <p-button
+                pRipple
+                class="p-button-rounded p-button-text"
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true"
+                (click)="onRemoveHuggingFaceApiKey()"
+              ></p-button>
+
+              <span class="font-bold">Hugging Face</span>
+            </div>
+          </ng-template>
+          <p-button
+            [disabled]="huggingFaceApiForm.pristine || huggingFaceApiForm.invalid"
+            pRipple
+            class="p-button-rounded p-button-text"
+            [icon]="hasHuggingFaceApiKey() ? 'pi pi-check' : 'pi pi-save'"
+            [severity]="hasHuggingFaceApiKey() ? 'success' : 'primary'"
+            [text]="true"
+            (click)="onHuggingFaceApiFormSubmit()"
+          ></p-button>
+        </div>
+    </li>
     </ai-chat-collapsable>
   </div>
   <ai-chat-share-btns></ai-chat-share-btns>

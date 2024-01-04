@@ -16,6 +16,13 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { DirectivesModule } from '../directives/directives.module';
+import { ChipModule } from 'primeng/chip';
+import { ListboxModule } from 'primeng/listbox';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DeferModule } from 'primeng/defer';
+import { FocusTrapModule } from 'primeng/focustrap';
+
+
 
 
 
@@ -47,6 +54,11 @@ import { DirectivesModule } from '../directives/directives.module';
     DropdownModule,
     ToastModule,
     DirectivesModule,
+    ChipModule,
+    ListboxModule,
+    CheckboxModule,
+    DeferModule,
+    FocusTrapModule
   ],
 })
 export class SharedModule {}

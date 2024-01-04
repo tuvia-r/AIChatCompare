@@ -10,6 +10,8 @@ import { ModelParamsService } from '../../../services/model-params.service';
 import { map } from 'rxjs/operators';
 import { v4 } from 'uuid';
 import { WINDOW_BREAKPOINT } from '../../../utils';
+import { ActiveChatService } from '../../../services/active-chat.service';
+import { ChatsDbService } from '../../../services/chats-db.service';
 
 @Component({
   selector: 'ai-chat-side-bar',
@@ -20,6 +22,8 @@ export class SideBarComponent {
   private secretsStoreService = inject(SecretsStoreService);
   private chatsService = inject(ChatService);
   private displayService = inject(DisplayService);
+  private activeChatService = inject(ActiveChatService);
+  private chatsDbService = inject(ChatsDbService);
   paramService = inject(ModelParamsService);
 
   id = v4();
@@ -48,6 +52,7 @@ export class SideBarComponent {
 
   openAiApiForm = this.formBuilder.control('');
   googleApiForm = this.formBuilder.control('');
+  huggingFaceApiForm = this.formBuilder.control('');
 
   onGoogleApiFormSubmit() {
     this.secretsStoreService.setSecret('geminiApiKey', this.googleApiForm.value as string);
@@ -63,6 +68,20 @@ export class SideBarComponent {
 
   hasGoogleApiKey() {
     return !!this.secretsStoreService.getSecret('geminiApiKey');
+  }
+
+  onHuggingFaceApiFormSubmit() {
+    this.secretsStoreService.setSecret('huggingFaceApiKey', this.huggingFaceApiForm.value as string);
+    this.huggingFaceApiForm.setValue('');
+  }
+
+  onRemoveHuggingFaceApiKey() {
+    this.secretsStoreService.setSecret('huggingFaceApiKey', '');
+    this.huggingFaceApiForm.setValue('');
+  }
+
+  hasHuggingFaceApiKey() {
+    return !!this.secretsStoreService.getSecret('huggingFaceApiKey');
   }
 
   onOpenAiApiFormSubmit() {
@@ -84,14 +103,17 @@ export class SideBarComponent {
   }
 
   selectChat(chatId: string): void {
-    this.chatsService.goToChat(chatId);
+    this.activeChatService.setActiveChatById(chatId);
     if(window.innerWidth < WINDOW_BREAKPOINT) {
       this.displayService.isSidebarVisible$.next(false);
     }
   }
 
   deleteChat(chatId: string): void {
-    this.chatsService.deleteChat(chatId);
+    this.chatsDbService.deleteChat(chatId);
   }
 
+  toggleChatService(service: any) {
+    this.chatsService.toggleChatService(service.modelName);
+  }
 }

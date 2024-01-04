@@ -35,19 +35,17 @@
     <ai-chat-app-info></ai-chat-app-info>
   </ng-template>
   <div
-    [style.width.px]="container.clientWidth"
+    [style.width.px]="containerWidth"
     class="sticky-bottom flex flex-column justify-content-center align-items-center gap-2 pb-2 px-5"
   >
     <p-button
       *ngIf="!isScrolledToBottom"
       [rounded]="true"
-      [outlined]="true"
       icon="pi pi-angle-down"
-      styleClass="shadow-none opacity-50"
+      styleClass="shadow-none opacity-40 shadow-1"
+      severity="secondary"
       (click)="scrollToBottom()"
     ></p-button>
-    <ai-chat-chat-input-bubble
-      class="bubble w-10"
-    ></ai-chat-chat-input-bubble>
+    <ai-chat-chat-input-bubble class="bubble w-10"></ai-chat-chat-input-bubble>
   </div>
 </div>
