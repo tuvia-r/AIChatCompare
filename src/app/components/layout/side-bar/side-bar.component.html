@@ -57,7 +57,7 @@
       title="API Keys"
       pTooltip="Secrets will be stored on you device (localStorage), and will not be shared with anyone"
     >
-      <li class="pb-1">
+      <li class="pb-2">
           <div
             class="row justify-content-between align-items-center gap-1 md:gap-4 overflow-x-auto"
           >
@@ -97,7 +97,7 @@
             ></p-button>
           </div>
       </li>
-      <li>
+      <li class="pb-2">
           <div class="row justify-content-between align-items-center">
             <span class="p-float-label w-8" *ngIf="!hasGoogleApiKey(); else GeminiTitle">
               <input
@@ -136,7 +136,7 @@
             ></p-button>
           </div>
       </li>
-      <li>
+      <li class="pb-2">
         <div class="row justify-content-between align-items-center">
           <span class="p-float-label w-8" *ngIf="!hasHuggingFaceApiKey(); else HuggingFaceTitle">
             <input

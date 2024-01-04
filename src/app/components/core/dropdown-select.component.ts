@@ -23,7 +23,7 @@ import { ListboxFilterEvent } from 'primeng/listbox';
               [multiple]="true"
               optionLabel="modelName"
               [filter]="true"
-              [style]="{ width: '29rem' }"
+              [style]="{ width: 'min(30rem, 100vw)' }"
               [listStyle]="{ 'max-height': '320px' }"
               [virtualScrollItemSize]="46"
               [lazy]="true"
