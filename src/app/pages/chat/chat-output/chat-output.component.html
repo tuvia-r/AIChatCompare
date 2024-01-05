@@ -1,6 +1,6 @@
 <div class="column w-full" [class.bg-teal-50]="message.isPrimary">
   <div class="relative w-full">
-    <div class="px-3">
+    <div class="px-3 pb-7">
       <markdown
         markdown
         clipboard
@@ -13,15 +13,35 @@
       >
     </markdown>
     </div>
-    <div class="pt-2 pb-4 w-full">
-      <div *ngIf="message.error" class="px-4 py-1">
-        <span class="text-red-500 text-300 text-sm">{{ message.error }}</span>
-      </div>
-      <div *ngIf="message.warnings" class="px-4 py-1">
-        <span class="text-orange-700 text-300 text-xs">{{ message.warnings }}</span>
-      </div>
-    </div>
     <div class="row w-full absolute bottom-0 justify-content-end pointer-events-none pt-2">
+      <p-button
+        pRipple
+        [text]="true"
+        icon="pi pi-info-circle"
+        class="p-button-rounded p-button-text pointer-events-auto"
+        styleClass="shadow-none"
+        severity="danger"
+        *ngIf="message.error"
+        (onClick)="ErrorOverlay.toggle($event)"
+        size="small"
+        tooltipPosition="left"
+        pTooltip="This message has an error"
+      >
+      </p-button>
+      <p-button
+        pRipple
+        [text]="true"
+        icon="pi pi-exclamation-triangle"
+        class="p-button-rounded p-button-text pointer-events-auto"
+        styleClass="shadow-none"
+        severity="warning"
+        *ngIf="message.warnings && message.warnings.length > 0"
+        (onClick)="WarningsOverlay.toggle($event)"
+        size="small"
+        tooltipPosition="left"
+        pTooltip="This message has an warnings"
+      >
+      </p-button>
       <p-button
         pRipple
         class="p-button-rounded p-button-text pointer-events-auto"
@@ -62,3 +82,15 @@
     </div>
   </div>
 </div>
+
+<p-overlayPanel #ErrorOverlay>
+  <div class="px-4 py-1 max-h-20rem overflow-x-auto">
+    <span class="text-red-500 text-300 text-sm">{{ message.error }}</span>
+  </div>
+</p-overlayPanel>
+
+<p-overlayPanel #WarningsOverlay>
+  <div class="px-4 py-1 max-h-20rem overflow-x-auto ">
+    <span class="text-orange-700 text-300 text-xs">{{ toString(message.warnings ?? []).slice(0, maxErrorMessageLength) }}</span>
+  </div>
+</p-overlayPanel>

@@ -2,7 +2,7 @@
   class="column gap-4 p-2 justify-content-between text-color-secondary h-full"
 >
   <div class="column gap-1">
-    <ai-chat-collapsable title="Chats" containerClass="sidebar-chats py-2">
+    <ai-chat-collapsable [isInitiallyOpen]="true" title="Chats" containerClass="sidebar-chats py-2">
       <li class="pb-1" *ngFor="let item of allChats$ | async">
         <div
           class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700 hover:surface-200 transition-duration-150 transition-colors p-ripple"

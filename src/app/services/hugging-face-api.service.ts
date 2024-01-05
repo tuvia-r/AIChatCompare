@@ -212,7 +212,9 @@ export class HuggingFaceApiService {
         this.instance?.post(model.path, {
           temperature: this.modelParamsService.temperature,
           return_full_text: false,
-          wait_for_model: true,
+          options: {
+            wait_for_model: true,
+          },
           inputs: input,
         } as HuggingFaceRequest)
       );

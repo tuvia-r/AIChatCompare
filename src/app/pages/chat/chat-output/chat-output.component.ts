@@ -15,6 +15,8 @@ export class ChatOutputComponent {
   private activeChatService = inject(ActiveChatService);
   hasPrimary$ = this.chatService.hasPrimary$;
 
+  maxErrorMessageLength = 200;
+
   ButtonComponent = CopyBtnComponent;
   @Input() message!: ChatMessage;
   @Input() isLast = false;
@@ -29,5 +31,9 @@ export class ChatOutputComponent {
 
   onBranchClick() {
     this.chatService.branchOutChat(this.message.id);
+  }
+
+  toString(arr: string[]) {
+    return arr.join(', ');
   }
 }

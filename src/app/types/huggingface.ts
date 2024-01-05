@@ -23,7 +23,9 @@ export interface HuggingFaceChatMessage {
 export interface HuggingFaceOptions {
   temperature: number;
   return_full_text: boolean;
-  wait_for_model: boolean;
+  options: {
+    wait_for_model: boolean;
+  }
 }
 
 export interface HuggingFaceRequest extends HuggingFaceOptions {
