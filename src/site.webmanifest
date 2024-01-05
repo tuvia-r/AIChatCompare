@@ -1,12 +1,20 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "AI Chat Compare",
+    "short_name": "AI Compare",
+    "start_url": ".",
+    "description": "Chat and Compare Multiple AI Chatbots side by side",
     "icons": [
        {
           "src": "/android-chrome-192x192.png",
           "sizes": "192x192",
           "type": "image/png"
        }
+    ],
+    "shortcuts": [
+      {
+        "name": "Chat",
+        "url": "/chat"
+      }
     ],
     "theme_color": "#FFFFFF",
     "background_color": "#FFFFFF",

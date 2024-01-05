@@ -5,7 +5,12 @@
 @import "primeflex/primeflex.scss";
 @import "primeflex/themes/primeone-light.css";
 
-html, body { height: 100%; overflow: hidden; }
+html {
+  height: 100vh;
+}
+body {
+  height: 100%;
+}
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .column {
