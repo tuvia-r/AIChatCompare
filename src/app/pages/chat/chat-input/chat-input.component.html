@@ -24,7 +24,18 @@
         pTooltip="Copy to Clipboard"
         (click)="copyToClipboard()"
         styleClass="shadow-none"
+        tooltipPosition="left"
       ></p-button>
+      <p-button
+        pRipple
+        class="p-button-rounded p-button-text pointer-events-auto shadow-none"
+        icon="pi pi-undo"
+        *ngIf="isLast && !(isLoading$ | async)"
+        (click)="regenerate()"
+        [text]="true"
+        tooltipPosition="left"
+        pTooltip="Regenerate"
+    ></p-button>
     </div>
   </div>
 </div>

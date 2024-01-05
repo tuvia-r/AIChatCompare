@@ -48,7 +48,8 @@
 }
 
 ::ng-deep .sidebar-chats {
-  max-height: calc(60vh);
-  overflow-y: auto;
+  max-height: calc(50vh);
+  overflow-y: auto !important;
+  display: block;
 }
 

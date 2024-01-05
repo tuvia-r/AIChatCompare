@@ -11,6 +11,7 @@
             @if(group.sourceType === 'user'){
             <ai-chat-chat-input
               [message]="group.messageBySource['user']?.text ?? ''"
+              [isLast]="i === messageGroups.length - 2"
               [disabled]="true"
             ></ai-chat-chat-input>
             } @else {

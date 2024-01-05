@@ -8,7 +8,7 @@ export interface HuggingFaceModelStatus {
 export interface HuggingFaceModel {
   name: string;
   path: string;
-  type: 'conversational' | 'text-generation';
+  type: 'conversational' | 'text-generation' | 'text2text-generation';
   formatter?: (messages: HuggingFaceChatMessage[]) => string;
   responseFormatter?: (response: string) => string;
   status?: HuggingFaceModelStatus;

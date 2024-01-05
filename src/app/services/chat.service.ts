@@ -43,6 +43,10 @@ export class ChatService {
     this.chatServices$.next(new Map(this.chatServices$.value));
   }
 
+  hasChatService(name: string) {
+    return this.chatServices$.value.has(name);
+  }
+
   toggleChatService(name: string) {
     const chatService = this.chatServices$.value.get(name);
     if (!chatService) return;
@@ -63,6 +67,16 @@ export class ChatService {
   async getHistory() {
     const chat = this.activeChatService.chat;
     return chat?.getPrimaryTree() ?? [];
+  }
+
+  async regenerateLastMessage() {
+    const chat = this.activeChatService.chat;
+    if (!chat) return;
+    const groups = chat.groups;
+    if(groups.length < 2) return;
+    const message = groups[groups.length - 2].messageBySource[MessageSource.User]?.text;
+    this.activeChatService.removeLast2Groups();
+    return this.message(message ?? '');
   }
 
   async message(content: string) {

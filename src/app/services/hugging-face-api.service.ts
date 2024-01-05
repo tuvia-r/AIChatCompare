@@ -9,31 +9,8 @@ import { ChatService } from './chat.service';
 import { ToastService } from './toast.service';
 import { staticModels } from './static-models';
 import { HuggingFaceChatMessage, HuggingFaceModel, HuggingFaceModelStatus, HuggingFaceRequest, HuggingFaceResponse } from '../types';
+import { formatterByTags } from '../utils';
 
-
-const gptFormatter = (messages: HuggingFaceChatMessage[]) => {
-  return (
-    messages
-      .map(
-        (message) =>
-          `${
-            message.role === 'bot'
-              ? 'GPT4 Correct Assistant: '
-              : 'GPT4 Correct User: '
-          }` + message.content
-      )
-      .join('<|end_of_turn|>') + '<|end_of_turn|> GPT4 Correct Assistant:'
-  );
-};
-
-const isGpt = (model: any) => {
-  return (
-    model.tags.includes('gpt') ||
-    model.tags.includes('gpt2') ||
-    model.tags.includes('gpt3') ||
-    model.tags.includes('gpt5')
-  );
-};
 
 @Injectable({
   providedIn: 'root',
@@ -49,12 +26,16 @@ export class HuggingFaceApiService {
   private models: HuggingFaceModel[] = [];
 
   async getModels(
-    page: number = 0,
-    type: 'conversational' | 'text-generation' = 'conversational',
-    search: string = ''
+    params: {
+    page: number,
+    type: 'conversational' | 'text-generation' | 'text2text-generation',
+    search: string,
+    limit: number
+    }
   ) {
+    const { page, type, search, limit } = params;
     const res = await this.apiInstance?.get(
-      `?sort=likes&direction=-1&page=${page}&limit=50&filter=${type},endpoints_compatible,transformers&search=${search}`
+      `?sort=likes&direction=-1&page=${page}&limit=${limit}&filter=${type},endpoints_compatible&search=${search}`
     );
     return Promise.all(
       res?.data.map(
@@ -63,8 +44,8 @@ export class HuggingFaceApiService {
             name: model.modelId,
             path: `/${model.modelId}`,
             type: model.pipeline_tag,
-            formatter: isGpt(model) ? gptFormatter : undefined,
             status: await this.getStatus(model.modelId).catch(() => undefined),
+            ...formatterByTags(model.tags) ?? {},
           } as HuggingFaceModel)
       )
     );
@@ -75,13 +56,32 @@ export class HuggingFaceApiService {
     return res?.data as HuggingFaceModelStatus;
   }
 
-  async searchModels(search: string) {
+  async searchModels(search: string, limit = 50) {
     await this.init();
-    const conversational = await this.getModels(0, 'conversational', search);
-    const textGeneration = await this.getModels(0, 'text-generation', search);
+    const conversational = await this.getModels({
+      page: 0,
+      limit,
+      type: 'conversational',
+      search,
+    });
+    const textGeneration = await this.getModels({
+      page: 0,
+      limit,
+      type: 'text-generation',
+      search,
+    });
+    const text2textGeneration = await this.getModels({
+      page: 0,
+      limit,
+      type: 'text2text-generation',
+      search,
+    });
     const result = [...conversational, ...textGeneration].filter(
       (model) => model.status?.state === 'Loadable'
     );
+
+    console.log(`found ${result.length} models for ${search}`);
+
     this.registerModels(result);
   }
 
@@ -94,10 +94,11 @@ export class HuggingFaceApiService {
       .get(tokenizerConfigFilePath)
       .catch(() => undefined);
     if (tokenizerConfig) {
+      const eosToken = typeof tokenizerConfig.data.eos_token === 'string' ? tokenizerConfig.data.eos_token : tokenizerConfig.data.eos_token?.content ?? '';
       return (messages: HuggingFaceChatMessage[]) =>
         messages.map((message) => message.content).join('\n') +
         '\n' +
-        tokenizerConfig?.data.eos_token;
+        eosToken;
     }
 
     return (messages: HuggingFaceChatMessage[]) =>
@@ -106,6 +107,12 @@ export class HuggingFaceApiService {
 
   constructor() {
     this.initModels();
+
+    this.modelParamsService.enabledModels.map((modelName) => {
+      if(!this.chatService.hasChatService(modelName)) {
+        this.searchModels(modelName, 1);
+      }
+    });
   }
 
   async initModels() {
@@ -239,12 +246,12 @@ export class HuggingFaceApiService {
   }
 }
 
-const retry = async <T>(fn: () => Promise<T> | undefined, retries = 3): Promise<T | undefined> => {
+const retry = async <T>(fn: () => Promise<T> | undefined, retries = 5): Promise<T | undefined> => {
   try {
     return await fn();
   } catch (error: any) {
     if(/is currently loading/.test(error?.response?.data.error)) {
-      const waitTime = (error?.response?.data.estimated_time * 1000 ?? 10 * 1000) / 2;
+      const waitTime = +((error?.response?.data.estimated_time * 1000 ?? 5 * 1000) / 3).toFixed(0);
       console.log(`Waiting ${waitTime}ms for model to load`);
       await new Promise((resolve) => setTimeout(resolve, waitTime));
     }

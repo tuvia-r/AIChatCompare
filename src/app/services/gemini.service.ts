@@ -19,7 +19,7 @@ export class GeminiService extends ChatServiceBase {
   private secretStoreService = inject(SecretsStoreService);
   private toastsService = inject(ToastService);
 
-  readonly modelName = 'Gemini';
+  readonly modelName = 'Gemini Pro';
 
   readonly link = 'https://deepmind.google/technologies/gemini/#introduction';
 
@@ -101,13 +101,19 @@ export class GeminiService extends ChatServiceBase {
         summary: 'Error',
         detail: 'Error communicating with Gemini API' + error.message,
       })
-      return;
+      return {
+        id: v4(),
+        text: '',
+        source: MessageSource.Bot,
+        error: error.message,
+        sourceName: this.modelName,
+        parentMessageId: message.id,
+      }
     }
-    if(!response) return;
 
     const chatMessage: ChatMessage = {
       id: v4(),
-      text: response.response.text(),
+      text: response?.response.text()!,
       source: MessageSource.Bot,
       sourceName: this.modelName,
       parentMessageId: message.id,

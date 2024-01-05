@@ -11,9 +11,8 @@
       </div>
       <span [class.text-red-500]="item.error" class="white-space-nowrap">{{item.sourceName}}</span>
     </ng-template>
-    <div class="w-full p-3">
+    <div class="w-full p-3" *ngIf="!item.id">
       <p-skeleton
-        *ngIf="!item.id"
         styleClass="w-full h-2rem"
       ></p-skeleton>
     </div>

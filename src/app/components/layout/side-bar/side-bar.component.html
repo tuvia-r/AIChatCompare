@@ -14,7 +14,7 @@
             (click)="selectChat(item.id)"
             [pTooltip]="item.value"
           >
-            <span class="font-bold">{{ item.label }}</span>
+            <span class="font-bold text-color">{{ item.label }}</span>
           </div>
           <p-button
             pRipple
@@ -34,12 +34,11 @@
     </ai-chat-collapsable>
 
     <ai-chat-collapsable title="Chat Settings" containerClass="py-2 pr-3">
-
       <li>
         <div
           class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700"
         >
-          <span class="font-bold">Temp</span>
+          <span class="font-bold text-color">Temp</span>
           <p-slider
             class="w-6"
             [min]="0.1"
@@ -57,127 +56,65 @@
       title="API Keys"
       pTooltip="Secrets will be stored on you device (localStorage), and will not be shared with anyone"
     >
-      <li class="pb-2">
-          <div
-            class="row justify-content-between align-items-center gap-1 md:gap-4 overflow-x-auto"
-          >
-            <span class="p-float-label w-8" *ngIf="!hasOpenAiApiKey(); else OpenAiTitle">
-              <input
-                pInputText
-                type="password"
-                [id]="'openAiKey' + id"
-                class="w-full"
-                [formControl]="openAiApiForm"
-              />
-              <label [for]="'openAiKey' + id" class="font-bold">OpenAI</label>
-            </span>
-            <ng-template #OpenAiTitle>
-              <div class="flex align-items-center gap-2">
-                <p-button
-                  pRipple
-                  class="p-button-rounded p-button-text"
-                  icon="pi pi-times"
-                  severity="danger"
-                  [text]="true"
-                  (click)="onRemoveOpenAiApiKey()"
-                ></p-button>
-
-                <span class="font-bold">OpenAI</span>
-              </div>
-            </ng-template>
-            <p-button
-            [disabled]="openAiApiForm.pristine || openAiApiForm.invalid"
-              pRipple
-              class="p-button-rounded p-button-text"
-              icon="pi pi-save"
-              [text]="true"
-              [icon]="hasOpenAiApiKey() ? 'pi pi-check' : 'pi pi-save'"
-              [severity]="hasOpenAiApiKey() ? 'success' : 'primary'"
-              (click)="onOpenAiApiFormSubmit()"
-            ></p-button>
-          </div>
+      <li class="pb-2 pl-2" *ngFor="let secretConfig of secretConfigs">
+        <ng-container
+          [ngTemplateOutlet]="secretItem"
+          [ngTemplateOutletContext]="{ secretConfig }"
+        >
+        </ng-container>
       </li>
-      <li class="pb-2">
-          <div class="row justify-content-between align-items-center">
-            <span class="p-float-label w-8" *ngIf="!hasGoogleApiKey(); else GeminiTitle">
-              <input
-                pInputText
-                type="password"
-                [id]="'googleAiKey' + id"
-                class="w-full"
-                [formControl]="googleApiForm"
-              />
-              <label [for]="'googleAiKey' + id" class="font-bold"
-                >Google Gemini</label
-              >
-            </span>
-            <ng-template #GeminiTitle>
-              <div class="flex align-items-center gap-2">
-                <p-button
-                  pRipple
-                  class="p-button-rounded p-button-text"
-                  icon="pi pi-times"
-                  severity="danger"
-                  [text]="true"
-                  (click)="onRemoveGoogleApiKey()"
-                ></p-button>
-
-                <span class="font-bold">Google Gemini</span>
-              </div>
-            </ng-template>
-            <p-button
-              [disabled]="googleApiForm.pristine || googleApiForm.invalid"
-              pRipple
-              class="p-button-rounded p-button-text"
-              [icon]="hasGoogleApiKey() ? 'pi pi-check' : 'pi pi-save'"
-              [severity]="hasGoogleApiKey() ? 'success' : 'primary'"
-              [text]="true"
-              (click)="onGoogleApiFormSubmit()"
-            ></p-button>
-          </div>
-      </li>
-      <li class="pb-2">
-        <div class="row justify-content-between align-items-center">
-          <span class="p-float-label w-8" *ngIf="!hasHuggingFaceApiKey(); else HuggingFaceTitle">
-            <input
-              pInputText
-              type="password"
-              [id]="'HuggingFaceApiKey' + id"
-              class="w-full"
-              [formControl]="huggingFaceApiForm"
-            />
-            <label [for]="'HuggingFaceApiKey' + id" class="font-bold"
-              >Hugging Face</label
-            >
-          </span>
-          <ng-template #HuggingFaceTitle>
-            <div class="flex align-items-center gap-2">
-              <p-button
-                pRipple
-                class="p-button-rounded p-button-text"
-                icon="pi pi-times"
-                severity="danger"
-                [text]="true"
-                (click)="onRemoveHuggingFaceApiKey()"
-              ></p-button>
-
-              <span class="font-bold">Hugging Face</span>
-            </div>
-          </ng-template>
-          <p-button
-            [disabled]="huggingFaceApiForm.pristine || huggingFaceApiForm.invalid"
-            pRipple
-            class="p-button-rounded p-button-text"
-            [icon]="hasHuggingFaceApiKey() ? 'pi pi-check' : 'pi pi-save'"
-            [severity]="hasHuggingFaceApiKey() ? 'success' : 'primary'"
-            [text]="true"
-            (click)="onHuggingFaceApiFormSubmit()"
-          ></p-button>
-        </div>
-    </li>
     </ai-chat-collapsable>
   </div>
   <ai-chat-share-btns></ai-chat-share-btns>
 </div>
 
-
+<ng-template #secretItem let-secretConfig="secretConfig">
+  <div class="row justify-content-between align-items-center">
+    <span
+      class="p-float-label w-8"
+      *ngIf="!hesSecret(secretConfig); else title"
+    >
+      <input
+        pInputText
+        type="password"
+        [id]="secretConfig.label"
+        class="w-full"
+        [formControl]="secretConfig.formControl"
+      />
+      <label [for]="secretConfig" class="font-bold">{{
+        secretConfig.label
+      }}</label>
+    </span>
+    <ng-template #title>
+      <div class="flex align-items-center gap-2">
+        <span class="font-bold">{{ secretConfig.label }}</span>
+      </div>
+    </ng-template>
+    <div class="flex justify-content-end">
+      <p-button
+          pRipple
+          class="p-button-rounded p-button-text"
+          icon="pi pi-times"
+          severity="danger"
+          [text]="true"
+          (click)="onSecretRemove(secretConfig)"
+        ></p-button>
+      <p-button
+        [disabled]="secretConfig.formControl.pristine || secretConfig.formControl.invalid"
+        *ngIf="!hesSecret(secretConfig)"
+        pRipple
+        class="p-button-rounded p-button-text"
+        icon="pi pi-save"
+        severity="primary"
+        [text]="true"
+        (click)="onSecretSubmit(secretConfig)"
+      ></p-button>
+      <p-button
+        pRipple
+        icon="pi pi-external-link"
+        [text]="true"
+        (click)="onSecretHelp(secretConfig)"
+      ></p-button>
+    </div>
+  </div>
+</ng-template>

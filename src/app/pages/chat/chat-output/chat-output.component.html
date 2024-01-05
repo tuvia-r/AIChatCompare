@@ -1,6 +1,6 @@
 <div class="column w-full" [class.bg-teal-50]="message.isPrimary">
   <div class="relative w-full">
-    <div class="px-3 pb-7">
+    <div class="px-3">
       <markdown
         markdown
         clipboard
@@ -13,11 +13,13 @@
       >
     </markdown>
     </div>
-    <div *ngIf="message.error" class="px-4 py-1">
-      <span class="text-red-500 text-300 text-sm">{{ message.error }}</span>
-    </div>
-    <div *ngIf="message.warnings" class="px-4 py-1">
-      <span class="text-orange-700 text-300 text-xs">{{ message.warnings }}</span>
+    <div class="pt-2 pb-4 w-full">
+      <div *ngIf="message.error" class="px-4 py-1">
+        <span class="text-red-500 text-300 text-sm">{{ message.error }}</span>
+      </div>
+      <div *ngIf="message.warnings" class="px-4 py-1">
+        <span class="text-orange-700 text-300 text-xs">{{ message.warnings }}</span>
+      </div>
     </div>
     <div class="row w-full absolute bottom-0 justify-content-end pointer-events-none pt-2">
       <p-button
@@ -57,12 +59,6 @@
         (click)="copyToClipboard()"
         styleClass="shadow-none"
       ></p-button>
-      <!-- <p-button
-        pRipple
-        class="p-button-rounded p-button-text pointer-events-auto shadow-none"
-        icon="pi pi-undo"
-        [text]="true"
-      ></p-button> -->
     </div>
   </div>
 </div>

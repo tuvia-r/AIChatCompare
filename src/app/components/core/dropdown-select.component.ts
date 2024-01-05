@@ -28,9 +28,11 @@ import { ListboxFilterEvent } from 'primeng/listbox';
               [virtualScrollItemSize]="46"
               [lazy]="true"
               scrollHeight="250px"
-              (onFilter)="onFilter.emit($event)"
+              (onFilter)="onFiltering($event)"
               pFocusTrap
               [filterMessage]="filterPlaceHolder"
+              [ariaFilterLabel]="filterPlaceHolder"
+              [filterPlaceHolder]="filterPlaceHolder"
             >
               <ng-template let-item pTemplate="item">
                 <div
@@ -84,6 +86,7 @@ export class DropdownSelectComponent {
   @Input() labelName: string = '';
   @Input() disabledName: string = '';
   @Input() filterPlaceHolder: string = '';
+  @Input() filterDelay: number = 500;
 
   @Output() selectedChanges = new EventEmitter<{
     all: any[];
@@ -93,5 +96,17 @@ export class DropdownSelectComponent {
 
   open(link: string) {
     window.open(link, '_blank');
+  }
+
+  filterTimeout?: NodeJS.Timeout;
+
+  onFiltering(event: ListboxFilterEvent) {
+    if (this.filterTimeout) {
+      clearTimeout(this.filterTimeout);
+    }
+
+    this.filterTimeout = setTimeout(() => {
+      this.onFilter.emit(event);
+    }, this.filterDelay);
   }
 }

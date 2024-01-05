@@ -60,12 +60,20 @@ export class Gpt4Service extends ChatServiceBase {
     }
     catch (error: any) {
       console.error(error);
+      const message = error?.response?.data?.error ?? error.message;
       this.toastsService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Error communicating with OpenAI API' + error.message,
+        detail: 'Error communicating with OpenAI API' + message,
       })
-      return;
+      return {
+        id: v4(),
+        text: '',
+        error: message,
+        source: MessageSource.Bot,
+        sourceName: this.modelName,
+        parentMessageId: message.id,
+      }
     }
 
     const chatMessage: ChatMessage = {

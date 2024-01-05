@@ -23,19 +23,19 @@
       labelName="modelName"
       selectionName="enabled"
       disabledName="isAvailable"
-      filterPlaceHolder="Search Selected And Hugging Face Models"
+      filterPlaceHolder="Search Hugging Face Models"
       class="pr-1"
       (onFilter)="onChatServiceFilter($event)"
       (selectedChanges)="onChatServiceChange($event)"
       ></chat-dropdown-select>
     </ng-container>
-    <p-button
+    <!-- <p-button
       class="p-button-rounded p-button-text"
       icon="pi pi-info-circle"
       [text]="true"
       styleClass="shadow-none"
       (click)="op.toggle($event)"
-    ></p-button>
+    ></p-button> -->
     <p-button
       class="p-button-rounded p-button-text"
       icon="pi pi-plus"

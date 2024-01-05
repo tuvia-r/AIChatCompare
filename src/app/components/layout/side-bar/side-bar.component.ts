@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { SecretsStoreService } from '../../../services/secrets-store.service';
 import { GeminiService } from '../../../services/gemini.service';
 import { GptThreeService } from '../../../services/gpt-3.service';
@@ -7,11 +7,18 @@ import { Gpt4Service } from '../../../services/gpt-4.service';
 import { DisplayService } from '../../../services';
 import { ChatService } from '../../../services/chat.service';
 import { ModelParamsService } from '../../../services/model-params.service';
-import { map } from 'rxjs/operators';
+import { map, take, tap } from 'rxjs/operators';
 import { v4 } from 'uuid';
 import { WINDOW_BREAKPOINT } from '../../../utils';
 import { ActiveChatService } from '../../../services/active-chat.service';
 import { ChatsDbService } from '../../../services/chats-db.service';
+
+interface SecretConfig {
+  label: string;
+  secretDbKey: string;
+  formControl: FormControl<string | null>;
+  helpUrl: string;
+}
 
 @Component({
   selector: 'ai-chat-side-bar',
@@ -54,52 +61,53 @@ export class SideBarComponent {
   googleApiForm = this.formBuilder.control('');
   huggingFaceApiForm = this.formBuilder.control('');
 
-  onGoogleApiFormSubmit() {
-    this.secretsStoreService.setSecret('geminiApiKey', this.googleApiForm.value as string);
-    this.googleApiForm.setValue('');
+  secretConfigs: SecretConfig[] = [
+    {
+      label: 'Google Gemini',
+      secretDbKey: 'geminiApiKey',
+      formControl: this.googleApiForm,
+      helpUrl: 'https://makersuite.google.com/app/apikey',
+    },
+    {
+      label: 'Hugging Face',
+      secretDbKey: 'huggingFaceApiKey',
+      formControl: this.huggingFaceApiForm,
+      helpUrl: 'https://huggingface.co/docs/api-inference/quicktour',
+    },
+    {
+      label: 'OpenAI',
+      secretDbKey: 'openAiApiKey',
+      formControl: this.openAiApiForm,
+      helpUrl: 'https://platform.openai.com/account/api-keys',
+    }
+  ];
+
+  onSecretSubmit(secretConfig: SecretConfig) {
+    this.secretsStoreService.setSecret(secretConfig.secretDbKey, secretConfig.formControl.value as string);
+    secretConfig.formControl.setValue('');
   }
 
-  onRemoveGoogleApiKey() {
-    this.secretsStoreService.setSecret('geminiApiKey', '');
-    this.googleApiForm.setValue('');
+  onSecretRemove(secretConfig: SecretConfig) {
+    this.secretsStoreService.setSecret(secretConfig.secretDbKey, '');
+    secretConfig.formControl.setValue('');
 
-    this.geminiService.enabled = false;
+    // Disable all chat services that require this secret
+    this.chatsService.allChatServices$.pipe(
+      tap(services => services.forEach(service => {
+        if(!service.isAvailable() && service.enabled) {
+          this.chatsService.toggleChatService(service.modelName);
+        }
+      })),
+      take(1)
+    ).subscribe();
   }
 
-  hasGoogleApiKey() {
-    return !!this.secretsStoreService.getSecret('geminiApiKey');
+  hesSecret(secretConfig: SecretConfig) {
+    return !!this.secretsStoreService.getSecret(secretConfig.secretDbKey);
   }
 
-  onHuggingFaceApiFormSubmit() {
-    this.secretsStoreService.setSecret('huggingFaceApiKey', this.huggingFaceApiForm.value as string);
-    this.huggingFaceApiForm.setValue('');
-  }
-
-  onRemoveHuggingFaceApiKey() {
-    this.secretsStoreService.setSecret('huggingFaceApiKey', '');
-    this.huggingFaceApiForm.setValue('');
-  }
-
-  hasHuggingFaceApiKey() {
-    return !!this.secretsStoreService.getSecret('huggingFaceApiKey');
-  }
-
-  onOpenAiApiFormSubmit() {
-    this.secretsStoreService.setSecret('openAiApiKey', this.openAiApiForm.value as string);
-    this.openAiApiForm.setValue('');
-  }
-
-  onRemoveOpenAiApiKey() {
-    this.secretsStoreService.setSecret('openAiApiKey', '');
-    this.openAiApiForm.setValue('');
-
-
-    this.gpt3Service.enabled = false;
-    this.gpt4Service.enabled = false;
-  }
-
-  hasOpenAiApiKey() {
-    return !!this.secretsStoreService.getSecret('openAiApiKey');
+  onSecretHelp(secretConfig: SecretConfig) {
+    window.open(secretConfig.helpUrl, '_blank');
   }
 
   selectChat(chatId: string): void {

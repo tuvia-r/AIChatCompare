@@ -78,6 +78,11 @@ export class ActiveChatService {
     this.setActiveChat()
   }
 
+  removeLast2Groups() {
+    this.chat?.groups.splice(-2, 2);
+    this.setActiveChat()
+  }
+
   updateTitle(title: string) {
     const chat = this.chat;
     if(!chat) return;

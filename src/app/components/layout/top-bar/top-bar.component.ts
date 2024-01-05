@@ -49,7 +49,7 @@ export class TopBarComponent {
 
   onChatServiceFilter(event: ListboxFilterEvent) {
     const { filter } = event;
-    console.log({ filter, event})
+    if(!filter) return;
     this.huggingFaceService.searchModels(
       filter
     );
