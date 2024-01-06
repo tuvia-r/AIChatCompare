@@ -14,9 +14,9 @@ export class ChatsDbService {
 
   constructor() {
     this.loadMessages();
-      this.allChats$.subscribe((chats) => {
+    this.allChats$.subscribe((chats) => {
         this.saveMessages();
-      });
+    });
   }
 
   async saveMessages() {
@@ -27,7 +27,6 @@ export class ChatsDbService {
         allChats.delete(chat.id);
       }
     }
-
 
     this.localDbService.set(CHATS_DB_KEY, JSON.stringify(Array.from(allChats.values()).map(chat => chat.toJson())));
   }
@@ -46,15 +45,14 @@ export class ChatsDbService {
   deleteChat(chatId: string) {
     this.allChats$.value.delete(chatId);
     this.allChats$.next(new Map(this.allChats$.value));
-    this.localDbService.set(
-      CHATS_DB_KEY,
-      Array.from(this.allChats$.value.entries())
-    );
   }
 
   updateChat(chat: Chat) {
     this.allChats$.value.set(chat.id, chat);
     this.allChats$.next(new Map(this.allChats$.value));
-    this.saveMessages();
+  }
+
+  getChat(chatId: string) {
+    return this.allChats$.value.get(chatId);
   }
 }

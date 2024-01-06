@@ -43,6 +43,7 @@
       (click)="createNewChat()"
       pTooltip="Create New Chat"
       styleClass="shadow-none"
+      [disabled]="(canCreateChat$ | async) === false"
     ></p-button>
   </div>
 </div>

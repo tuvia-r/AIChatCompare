@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, map } from 'rxjs';
-import { getObservableValue } from '../utils/get-observable-value';
 import { v4 } from 'uuid';
 import { ChatServiceBase } from './chat-service-base';
 import {
@@ -10,7 +9,7 @@ import {
 } from '../types/message.types';
 import { ToastService } from './toast.service';
 import { Chat } from '../models/chat';
-import { ActiveChatService } from './active-chat.service';
+import { ChatUtilsService } from './chat-utils.service';
 import { ChatsDbService } from './chats-db.service';
 
 @Injectable({
@@ -21,13 +20,14 @@ export class ChatService {
     new Map<string, ChatServiceBase>()
   );
   private toastService = inject(ToastService);
-  private activeChatService = inject(ActiveChatService);
+  private chatUtilsService = inject(ChatUtilsService);
   private chatsDbService = inject(ChatsDbService);
 
-  readonly chatId$ = this.activeChatService.chatId$;
-  readonly messageGroups$ = this.activeChatService.messageGroups$;
-  readonly hasPrimary$ = this.activeChatService.hasPrimary$;
-  readonly chat$ = this.activeChatService.activeChat$;
+  readonly chatId$ = this.chatUtilsService.chatId$;
+  readonly activeChat$ = this.chatUtilsService.activeChat$;
+  readonly messageGroups$ = this.chatUtilsService.activeMessageGroups$;
+  readonly hasPrimary$ = this.chatUtilsService.activeChatHasPrimary$;
+  readonly chat$ = this.chatUtilsService.activeChat$;
 
   readonly allChats$ = this.chatsDbService.allChats$;
 
@@ -64,33 +64,30 @@ export class ChatService {
     }
   }
 
-  async getHistory() {
-    const chat = this.activeChatService.chat;
+  async getHistory(chat: Chat) {
     return chat?.getPrimaryTree() ?? [];
   }
 
-  async regenerateLastMessage() {
-    const chat = this.activeChatService.chat;
-    if (!chat) return;
+  async regenerateLastMessage(chat: Chat) {
     const groups = chat.groups;
     if(groups.length < 2) return;
     const message = groups[groups.length - 2].messageBySource[MessageSource.User]?.text;
-    this.activeChatService.removeLast2Groups();
-    return this.message(message ?? '');
+    this.chatUtilsService.removeLast2Groups(chat);
+    return this.message(chat, message ?? '');
   }
 
-  async message(content: string) {
-    const hasPrimary = await getObservableValue(this.hasPrimary$);
+  async message(chat: Chat, content: string) {
+    const hasPrimary = this.chatUtilsService.hasPrimary(chat);
 
-    if (!hasPrimary || !content) {
-      throw new Error('No primary message');
+    if (!hasPrimary) {
+      return;
     }
 
     this.isLoading$.next(true);
     this.waitingForFirstResponse$.next(true);
 
     try {
-      const primary = await this.getHistory().then((h) => h.pop());
+      const primary = await this.getHistory(chat).then((h) => h.pop());
       const userMessage: ChatMessage = {
         id: v4(),
         text: content,
@@ -112,7 +109,7 @@ export class ChatService {
         return;
       }
 
-      this.activeChatService.addMessage(userMessage);
+      chat = this.chatUtilsService.addMessage(chat, userMessage);
 
       const newGroup: ChatMessageGroup = {
         id: v4(),
@@ -123,12 +120,12 @@ export class ChatService {
         }, {} as Record<string, ChatMessage | undefined>),
       };
 
-      this.activeChatService.addGroup(newGroup);
+      chat = this.chatUtilsService.addGroup(chat, newGroup);
 
       const promises = enabledServices.map((s) =>
-        s.sendMessage().then((m) => {
+        s.sendMessage(chat).then((m) => {
           if (m) {
-            this.activeChatService.addMessage(m, newGroup.id);
+            chat = this.chatUtilsService.addMessage(chat, m, newGroup.id);
           }
           return m;
         })
@@ -139,7 +136,7 @@ export class ChatService {
 
       const newMessage = messages[0];
       if (enabledServices.length === 1 && newMessage) {
-        this.activeChatService.setMessageAsPrimary(newMessage.id);
+        chat = await this.chatUtilsService.setMessageAsPrimary(chat, newMessage.id);
       }
     } finally {
       this.isLoading$.next(false);
@@ -147,27 +144,26 @@ export class ChatService {
         this.waitingForFirstResponse$.next(false);
       }
 
-      await this.checkTitle();
+      await this.checkTitle(chat);
     }
   }
 
-  async checkTitle() {
-    let chat = this.activeChatService.chat;
+  async checkTitle(chat: Chat, force = false) {
     if (!chat) return;
-    if (chat.title === new Chat().title) {
-      const title = await this.createTitle();
+    if (force || chat.title === new Chat().title) {
+      const title = await this.createTitle(chat);
       if (title) {
-        this.activeChatService.updateTitle(title);
+        this.chatUtilsService.updateTitle(chat, title);
       }
     }
   }
 
-  async createTitle(): Promise<string | undefined> {
+  async createTitle(chat: Chat): Promise<string | undefined> {
     const enabledServices = [...this.chatServices$.value.values()].filter(
       (cs) => cs.enabled
     );
     for (const service of enabledServices) {
-      const title = await service.createTitle();
+      const title = await service.createTitle(chat);
       if (title) {
         try {
           return parseJson(title).title;
@@ -181,13 +177,11 @@ export class ChatService {
     return undefined;
   }
 
-  async branchOutChat(fromMessageId: string) {
-    const chat = this.activeChatService.chat;
-    if (!chat) return;
+  async branchOutChat(chat: Chat, fromMessageId: string) {
     const newChat: Chat = chat.branchOut(fromMessageId);
     this.allChats$.value.set(newChat.id, newChat);
     this.allChats$.next(new Map(this.allChats$.value));
-    this.activeChatService.setActiveChatById(newChat.id);
+    this.chatUtilsService.setActiveChatById(newChat.id);
   }
 }
 

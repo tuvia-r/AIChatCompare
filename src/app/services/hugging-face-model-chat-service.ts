@@ -6,6 +6,7 @@ import { v4 } from "uuid";
 import { ChatService } from "./chat.service";
 import { ModelParamsService } from "./model-params.service";
 import { SecretsStoreService } from "./secrets-store.service";
+import { Chat } from "../models/chat";
 
 export class HuggingFaceModelChatService extends ChatServiceBase {
 
@@ -47,8 +48,8 @@ export class HuggingFaceModelChatService extends ChatServiceBase {
     return;
   }
 
-  async sendMessage() {
-    const history = (await this.chatService.getHistory()) ?? [];
+  async sendMessage(chat: Chat) {
+    const history = (await this.chatService.getHistory(chat)) ?? [];
     const messages = history.map((message) => ({
       role: message.source === 'user' ? 'user' : 'bot',
       content: message.text,
@@ -85,8 +86,8 @@ export class HuggingFaceModelChatService extends ChatServiceBase {
     return chatMessage;
   }
 
-  async createTitle() {
-    const history = (await this.chatService.getHistory()) ?? [];
+  async createTitle(chat: Chat) {
+    const history = (await this.chatService.getHistory(chat)) ?? [];
     const messages = history.map((message) => ({
       role: message.source === 'user' ? 'user' : 'bot',
       content: message.text,

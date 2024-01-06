@@ -16,6 +16,8 @@ export class ChatInputBubbleComponent {
   text = '';
 
   async onSend() {
+    const activeChat = await getObservableValue(this.chatService.activeChat$);
+    if (!activeChat) return;
     if (!this.text) {
       return;
     }
@@ -25,7 +27,7 @@ export class ChatInputBubbleComponent {
     }
     const message = this.text;
     this.text = '';
-    await this.chatService.message(message);
+    await this.chatService.message(activeChat, message);
   }
 
   onEnter(event: KeyboardEvent) {

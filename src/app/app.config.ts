@@ -20,6 +20,7 @@ import {
 } from '@angular/fire/analytics';
 import { environment } from './environments';
 
+
 const initializeAppFactory = (primeConfig: PrimeNGConfig) => () => {
   primeConfig.ripple = true;
 };

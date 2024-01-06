@@ -2,7 +2,8 @@ import { Component, Input, inject } from '@angular/core';
 import { CopyBtnComponent } from './copy-btn/copy-btn.component';
 import { ChatService } from '../../../services/chat.service';
 import { ChatMessage } from '../../../types/message.types';
-import { ActiveChatService } from '../../../services/active-chat.service';
+import { ChatUtilsService } from '../../../services/chat-utils.service';
+import { getObservableValue } from '../../../utils';
 
 @Component({
   selector: 'ai-chat-chat-output',
@@ -12,7 +13,7 @@ import { ActiveChatService } from '../../../services/active-chat.service';
 })
 export class ChatOutputComponent {
   private chatService = inject(ChatService);
-  private activeChatService = inject(ActiveChatService);
+  private activeChatService = inject(ChatUtilsService);
   hasPrimary$ = this.chatService.hasPrimary$;
 
   maxErrorMessageLength = 200;
@@ -41,7 +42,9 @@ export class ChatOutputComponent {
   };
 
   async setAsPrimary() {
-    await this.activeChatService.setMessageAsPrimary(this.message.id);
+    const activeChat = await getObservableValue(this.chatService.activeChat$);
+    if (!activeChat) return;
+    await this.activeChatService.setMessageAsPrimary(activeChat, this.message.id);
   }
 
   keepLatex(text: string) {
@@ -52,8 +55,10 @@ export class ChatOutputComponent {
     window.navigator.clipboard.writeText(this.message.text);
   }
 
-  onBranchClick() {
-    this.chatService.branchOutChat(this.message.id);
+  async onBranchClick() {
+    const activeChat = await getObservableValue(this.chatService.activeChat$);
+    if (!activeChat) return;
+    this.chatService.branchOutChat(activeChat, this.message.id);
   }
 
   toString(arr: string[]) {

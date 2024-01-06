@@ -86,13 +86,17 @@
 </div>
 
 <p-overlayPanel #ErrorOverlay>
-  <div class="px-4 py-1 max-h-20rem overflow-x-auto">
+  <ng-template pTemplate="content">
+  <div class="px-4 py-1 overflow-x-auto overlay-max">
     <span class="text-red-500 text-300 text-sm">{{ message.error }}</span>
   </div>
+</ng-template>
 </p-overlayPanel>
 
 <p-overlayPanel #WarningsOverlay>
-  <div class="px-4 py-1 max-h-20rem overflow-x-auto ">
-    <span class="text-orange-700 text-300 text-xs">{{ toString(message.warnings ?? []).slice(0, maxErrorMessageLength) }}</span>
+  <ng-template pTemplate="content">
+  <div class="px-4 py-1 overflow-x-auto overlay-max">
+    <span class="text-orange-700 text-300 text-xs">{{ toString(message.warnings ?? []) }}</span>
   </div>
+</ng-template>
 </p-overlayPanel>

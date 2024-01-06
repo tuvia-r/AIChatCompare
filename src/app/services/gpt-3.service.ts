@@ -7,6 +7,7 @@ import OpenAI from 'openai';
 import { ModelParamsService } from './model-params.service';
 import { ChatMessage, MessageSource } from '../types/message.types';
 import { ToastService } from './toast.service';
+import { Chat } from '../models/chat';
 
 @Injectable({
   providedIn: 'root',
@@ -38,11 +39,11 @@ export class GptThreeService extends ChatServiceBase {
 
   async startChat() {}
 
-  async sendMessage() {
+  async sendMessage(chat: Chat) {
 
     if(!this.enabled) return;
 
-    const history = (await this.chatService.getHistory()) ?? [];
+    const history = (await this.chatService.getHistory(chat)) ?? [];
     const message = history[history.length - 1];
 
     const openAiMessages = history?.map((message) => ({
@@ -89,10 +90,10 @@ export class GptThreeService extends ChatServiceBase {
     return chatMessage;
   }
 
-  override async createTitle(): Promise<string | undefined> {
+  override async createTitle(chat: Chat): Promise<string | undefined> {
     if(!this.enabled) return;
 
-    const history = (await this.chatService.getHistory()) ?? [];
+    const history = (await this.chatService.getHistory(chat)) ?? [];
     const message = history[history.length - 1];
 
     const openAiMessages = history?.map((message) => ({

@@ -10,7 +10,7 @@ import { ModelParamsService } from '../../../services/model-params.service';
 import { map, take, tap } from 'rxjs/operators';
 import { v4 } from 'uuid';
 import { WINDOW_BREAKPOINT } from '../../../utils';
-import { ActiveChatService } from '../../../services/active-chat.service';
+import { ChatUtilsService } from '../../../services/chat-utils.service';
 import { ChatsDbService } from '../../../services/chats-db.service';
 
 interface SecretConfig {
@@ -29,7 +29,7 @@ export class SideBarComponent {
   private secretsStoreService = inject(SecretsStoreService);
   private chatsService = inject(ChatService);
   private displayService = inject(DisplayService);
-  private activeChatService = inject(ActiveChatService);
+  private chatsUtilsService = inject(ChatUtilsService);
   private chatsDbService = inject(ChatsDbService);
   paramService = inject(ModelParamsService);
 
@@ -54,8 +54,9 @@ export class SideBarComponent {
 
   formBuilder = inject(FormBuilder);
 
+  canCreateChat$ = this.chatsService.activeChat$.pipe(map(chat => !chat || chat?.groups.length > 0));
   activeChatId$ = this.chatsService.chatId$;
-  allChats$ = this.chatsService.allChats$.pipe(map(chats => [...chats.entries()].reverse()), map(chats => chats.map(([id, chat]) => ({ id, label: chat.title.slice(0, 20) + '...', value: chat.title }))));
+  allChats$ = this.chatsService.allChats$.pipe(map(chats => [...chats.entries()].reverse()), map(chats => chats.map(([id, chat]) => ({ id, label: chat.title, value: chat.title }))));
 
   openAiApiForm = this.formBuilder.control('');
   googleApiForm = this.formBuilder.control('');
@@ -111,7 +112,7 @@ export class SideBarComponent {
   }
 
   selectChat(chatId: string): void {
-    this.activeChatService.setActiveChatById(chatId);
+    this.chatsUtilsService.setActiveChatById(chatId);
     if(window.innerWidth < WINDOW_BREAKPOINT) {
       this.displayService.isSidebarVisible$.next(false);
     }
@@ -123,5 +124,16 @@ export class SideBarComponent {
 
   toggleChatService(service: any) {
     this.chatsService.toggleChatService(service.modelName);
+  }
+
+  async regenerateChatTitle(chatId: string) {
+    const chat = this.chatsDbService.getChat(chatId);
+    if(!chat) return;
+    await this.chatsService.checkTitle(chat, true);
+  }
+
+  createChat() {
+    if(this.chatsUtilsService.activeChat && this.chatsUtilsService.activeChat?.groups.length === 0) return;
+    this.chatsUtilsService.newChat();
   }
 }

@@ -9,5 +9,7 @@ export const environment = {
     authDomain: 'ai-chat-compare.firebaseapp.com',
     messagingSenderId: '771377359574',
     measurementId: 'G-JHV37VJ2EJ',
-  }
+  },
+  domain: 'ai-chat-compare.web.app',
+  production: true,
 };

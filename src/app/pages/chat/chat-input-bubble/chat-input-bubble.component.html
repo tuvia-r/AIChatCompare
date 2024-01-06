@@ -1,22 +1,22 @@
-<div class="relative row justify-content-between align-items-center" *ngIf="!(isLoading$ | async); else loading">
+<div class="relative row justify-content-between align-items-center">
+  <textarea
+    [(ngModel)]="text"
+    class="pr-6 pt-4 max-h-29rem min-h-2rem w-full shadow-none overflow-y-auto bubble textarea"
+    pInputTextarea
+    [autoResize]="true"
+    (keydown.enter)="onEnter($any($event))"
+  ></textarea>
   <div
-    class="row absolute w-full bottom-0 justify-content-end align-items-center absolute pointer-events-none"
+    class="row absolute h-full w-full bottom-0 justify-content-end align-items-center absolute pointer-events-none z-3"
   >
     <!-- <i pRipple class="p-3 p-button-rounded p-button-text pointer-events-auto shadow-none text-primary pi pi-upload"></i> -->
-    <p-progressSpinner
-      *ngIf="isLoading$ | async"
-      styleClass="w-4rem h-4rem"
-      strokeWidth="4"
-      fill="var(--surface-ground)"
-      animationDuration="1s"
-    ></p-progressSpinner>
     <p-button
       pRipple
       class="p-3 p-button-rounded p-button-text pointer-events-auto text-primary"
       styleClass="shadow-none"
       [text]="true"
       icon="pi pi-send"
-      *ngIf="(isLoading$ | async) === false"
+      *ngIf="(isLoading$ | async) === false; else loading"
       [disabled]="(canSubmit$ | async) === false"
       (click)="onSend()"
       [pTooltip]="
@@ -26,15 +26,12 @@
       "
     ></p-button>
   </div>
-  <textarea
-    [(ngModel)]="text"
-    class="pr-6 pt-4 max-h-29rem min-h-2rem w-full shadow-none overflow-y-auto bubble shadow-1"
-    pInputTextarea
-    [autoResize]="true"
-    (keydown.enter)="onEnter($any($event))"
-  ></textarea>
 </div>
 
 <ng-template #loading>
-
+  <div class="flex justify-content-center align-items-center w-4rem">
+    <i
+      class="pi pi-spin pi-spinner text-primary text-4xl animation-duration-1000"
+    ></i>
+  </div>
 </ng-template>

@@ -2,17 +2,15 @@ import {
   Component,
   ComponentRef,
   ElementRef,
-  Host,
-  HostListener,
   ViewChild,
   inject,
 } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
-import { BehaviorSubject, Subject, combineLatest, map, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { ChatServiceBase } from '../../services/chat-service-base';
 import { HuggingFaceApiService } from '../../services/hugging-face-api.service';
-import { Listbox, ListboxChangeEvent } from 'primeng/listbox';
+import { Listbox } from 'primeng/listbox';
 
 @Component({
   selector: 'ai-chat-chat',
@@ -38,7 +36,6 @@ export class ChatComponent {
   messageGroups$ = this.chatService.messageGroups$;
 
   isScrolledToBottom: boolean = true;
-  containerWidth = this.document?.defaultView?.innerWidth;
 
   chatServices$ = this.chatService.allChatServices$;
 
@@ -62,12 +59,6 @@ export class ChatComponent {
     );
 
     intersectionObserver.observe(this.anchor?.nativeElement!);
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      this.containerWidth = entries[0].contentRect.width;
-    });
-
-    resizeObserver.observe(this.container?.nativeElement!);
   }
 
   setSelectedChatServices(services: ChatServiceBase[], currentServices: (ChatServiceBase & any)[]) {

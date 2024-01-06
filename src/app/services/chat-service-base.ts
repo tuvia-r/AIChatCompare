@@ -2,6 +2,7 @@ import { inject } from "@angular/core";
 import { ChatService } from "./chat.service";
 import { ModelParamsService } from "./model-params.service";
 import { ChatMessage } from "../types";
+import { Chat } from "../models/chat";
 
 const escape = '```'
 
@@ -44,9 +45,9 @@ export abstract class ChatServiceBase {
     this.chatService.registerChatService(this.modelName, this);
   }
 
-  abstract startChat(): Promise<void>;
-  abstract sendMessage(): Promise<ChatMessage | undefined>;
-  abstract createTitle(): Promise<string | undefined>;
+  abstract startChat(chat: Chat): Promise<void>;
+  abstract sendMessage(chat: Chat): Promise<ChatMessage | undefined>;
+  abstract createTitle(chat: Chat): Promise<string | undefined>;
   abstract init(): Promise<void>;
 
   abstract isAvailable(): boolean;

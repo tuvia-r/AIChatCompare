@@ -3,6 +3,19 @@
 >
   <div class="column gap-1">
     <ai-chat-collapsable [isInitiallyOpen]="true" title="Chats" containerClass="sidebar-chats py-2">
+        <i
+          header
+          pRipple
+          [class.text-300]="(canCreateChat$ | async) === false"
+          [class.text-600]="(canCreateChat$ | async) === true"
+          [class.hover:text-primary-500]="(canCreateChat$ | async) === true"
+          class="pi pi-plus z-5"
+          (click)="
+            $event.preventDefault();
+            $event.stopPropagation();
+            createChat()"
+        ></i>
+
       <li class="pb-1" *ngFor="let item of allChats$ | async">
         <div
           class="flex gap-2 align-items-center justify-content-between cursor-pointer p-2 border-round text-700 hover:surface-200 transition-duration-150 transition-colors p-ripple"
@@ -14,21 +27,29 @@
             (click)="selectChat(item.id)"
             [pTooltip]="item.value"
           >
-            <span class="font-bold text-color">{{ item.label }}</span>
+            <span class="font-bold text-color text-overflow-ellipsis white-space-nowrap overflow-hidden">{{ item.label }}</span>
           </div>
-          <p-button
-            pRipple
-            class="p-button-rounded p-button-text"
-            icon="pi pi-times"
-            size="small"
-            styleClass="shadow-none text-300 hover:text-red-700"
-            [text]="true"
-            (click)="
-              $event.preventDefault();
-              $event.stopPropagation();
-              deleteChat(item.id)
-            "
-          ></p-button>
+          <div class="flex align-items-center justify-content-end">
+            <i
+              pRipple
+              class="p-button-rounded w-2rem p-1 p-button-text pi pi-replay text-300 hover:text-700"
+              pTooltip="Regenerate chat title"
+              (click)="
+                $event.preventDefault();
+                $event.stopPropagation();
+                regenerateChatTitle(item.id)
+                "
+            ></i>
+            <i
+              pRipple
+              class="p-button-rounded w-2rem p-1 p-button-text pi pi-times text-300 hover:text-red-700"
+              (click)="
+                $event.preventDefault();
+                $event.stopPropagation();
+                deleteChat(item.id)
+              "
+            ></i>
+          </div>
         </div>
       </li>
     </ai-chat-collapsable>
@@ -46,7 +67,7 @@
             [step]="0.01"
             [(ngModel)]="paramService.temperature"
           ></p-slider>
-          <span class="font-bold">{{ paramService.temperature }}</span>
+          <span class="font-bold text-color">{{ paramService.temperature }}</span>
         </div>
       </li>
     </ai-chat-collapsable>

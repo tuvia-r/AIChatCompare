@@ -1,5 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { ChatService } from '../../../services';
+import { getObservableValue } from '../../../utils';
 
 @Component({
   selector: 'ai-chat-chat-input',
@@ -19,7 +20,9 @@ export class ChatInputComponent {
     window.navigator.clipboard.writeText(this.message);
   }
 
-  regenerate() {
-    return this.chatService.regenerateLastMessage();
+  async regenerate() {
+    const activeChat = await getObservableValue(this.chatService.activeChat$);
+    if (!activeChat) return;
+    return this.chatService.regenerateLastMessage(activeChat);
   }
 }

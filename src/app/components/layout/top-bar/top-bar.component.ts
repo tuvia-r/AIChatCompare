@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { DisplayService } from '../../../services';
 import { ChatService } from '../../../services/chat.service';
-import { ActiveChatService } from '../../../services/active-chat.service';
+import { ChatUtilsService } from '../../../services/chat-utils.service';
 import { ChatServiceBase } from '../../../services/chat-service-base';
 import { map } from 'rxjs';
 import { ListboxFilterEvent } from 'primeng/listbox';
@@ -15,9 +15,10 @@ import { HuggingFaceApiService } from '../../../services/hugging-face-api.servic
 export class TopBarComponent {
   private displayService = inject(DisplayService);
   private chatService = inject(ChatService);
-  private activeChatService = inject(ActiveChatService);
+  private activeChatService = inject(ChatUtilsService);
   private huggingFaceService = inject(HuggingFaceApiService);
 
+  canCreateChat$ = this.chatService.activeChat$.pipe(map(chat => !chat || chat?.groups.length > 0));
   showSidebar$ = this.displayService.isSidebarVisible$;
   chatServices$ = this.chatService.allChatServices$.pipe(
     map((services) => services.sort((a, b) => a.enabled ? -1 : 1)),

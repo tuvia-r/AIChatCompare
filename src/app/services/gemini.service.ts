@@ -7,6 +7,7 @@ import { ChatServiceBase, TITLE_PROMPT } from './chat-service-base';
 import { ModelParamsService } from './model-params.service';
 import { ChatMessage, MessageSource } from '../types/message.types';
 import { ToastService } from './toast.service';
+import { Chat } from '../models/chat';
 
 @Injectable({
   providedIn: 'root',
@@ -58,12 +59,12 @@ export class GeminiService extends ChatServiceBase {
     });
   }
 
-  async startChat(noHistory = false) {
+  async startChat(chat: Chat, noHistory = false) {
     if(this.enabled) {
       await this.init();
     }
 
-    let history = (await this.chatService.getHistory()).slice(0, -1);
+    let history = (await this.chatService.getHistory(chat)).slice(0, -1);
     if(!noHistory) {
       history = []
     }
@@ -80,13 +81,13 @@ export class GeminiService extends ChatServiceBase {
   }
 
 
-  async sendMessage() {
+  async sendMessage(chat: Chat) {
     if(!this.enabled) {
       return;
     }
-    await this.startChat();
+    await this.startChat(chat);
 
-    const message = (await this.chatService.getHistory())?.pop();
+    const message = (await this.chatService.getHistory(chat))?.pop();
 
     if(!message) return;
 
@@ -123,11 +124,11 @@ export class GeminiService extends ChatServiceBase {
   }
 
 
-  async createTitle() {
+  async createTitle(chat: Chat) {
     if(!this.enabled) {
       return;
     }
-    await this.startChat(true);
+    await this.startChat(chat, true);
 
     let response: GenerateContentResult | undefined;
     try {
@@ -135,7 +136,7 @@ export class GeminiService extends ChatServiceBase {
         `
         here is a start of a conversation:
         '''
-        ${(await this.chatService.getHistory()).map(message => message.text).join('\n')}
+        ${(await this.chatService.getHistory(chat)).map(message => message.text).join('\n')}
         '''
 
         ${TITLE_PROMPT}
