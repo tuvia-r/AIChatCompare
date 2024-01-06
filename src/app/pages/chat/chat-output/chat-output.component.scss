@@ -1,3 +1,15 @@
 :host {
   display: block;
 }
+
+
+:host ::ng-deep .katex-display {
+  display: inline;
+}
+
+:host ::ng-deep .katex-display {
+  display: inline !important;
+  .katex, .katex-display, .katex-html  {
+    display: inline !important;
+  }
+}

@@ -2,14 +2,16 @@
   <div class="relative w-full">
     <div class="px-3 pb-7">
       <markdown
-        markdown
+        #markdown
+        katex
+        [katexOptions]="katexOptions"
         clipboard
         lineNumbers
         [disableSanitizer]="true"
         class="w-full border-transparent shadow-none text-400 max-w-full"
         ngPreserveWhitespaces
         [clipboardButtonComponent]="ButtonComponent"
-        [data]="message.text"
+        [textContent]="keepLatex(message.text)"
       >
     </markdown>
     </div>
@@ -22,7 +24,7 @@
         styleClass="shadow-none"
         severity="danger"
         *ngIf="message.error"
-        (onClick)="ErrorOverlay.toggle($event)"
+        (click)="ErrorOverlay.toggle($event)"
         size="small"
         tooltipPosition="left"
         pTooltip="This message has an error"
@@ -36,7 +38,7 @@
         styleClass="shadow-none"
         severity="warning"
         *ngIf="message.warnings && message.warnings.length > 0"
-        (onClick)="WarningsOverlay.toggle($event)"
+        (click)="WarningsOverlay.toggle($event)"
         size="small"
         tooltipPosition="left"
         pTooltip="This message has an warnings"
