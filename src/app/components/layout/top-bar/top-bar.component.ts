@@ -18,6 +18,7 @@ export class TopBarComponent {
   private activeChatService = inject(ChatUtilsService);
   private huggingFaceService = inject(HuggingFaceApiService);
 
+  isNightMode$ = this.displayService.nightMode$;
   canCreateChat$ = this.chatService.activeChat$.pipe(map(chat => !chat || chat?.groups.length > 0));
   showSidebar$ = this.displayService.isSidebarVisible$;
   chatServices$ = this.chatService.allChatServices$.pipe(

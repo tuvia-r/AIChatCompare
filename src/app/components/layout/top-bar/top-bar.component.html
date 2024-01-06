@@ -45,6 +45,14 @@
       styleClass="shadow-none"
       [disabled]="(canCreateChat$ | async) === false"
     ></p-button>
+    <p-button
+      class="p-button-rounded p-button-text"
+      [icon]="isNightMode$.value ? 'pi pi-sun' : 'pi pi-moon'"
+      [text]="true"
+      (click)="isNightMode$.next(!isNightMode$.value)"
+      pTooltip="change theme"
+      styleClass="shadow-none"
+    ></p-button>
   </div>
 </div>
 

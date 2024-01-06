@@ -16,10 +16,10 @@ import { Component, Input } from '@angular/core';
       (click)="toggle()"
     >
       <span class="font-medium">{{ title }}</span>
-      <div #header>
+      <div class="flex gap-2">
         <ng-content select="[header]"> </ng-content>
+        <i [class.rotate-180]="isOpened" class="pi pi-chevron-down transition-all transition-duration-400"></i>
       </div>
-      <i *ngIf="!header.hasChildNodes()" [class.rotate-180]="isOpened" class="pi pi-chevron-down transition-all transition-duration-400"></i>
     </div>
     <ul
       [class.hidden]="!isInitiallyOpen"

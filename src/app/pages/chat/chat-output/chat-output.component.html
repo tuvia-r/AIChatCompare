@@ -1,4 +1,4 @@
-<div class="column w-full" [class.bg-teal-50]="message.isPrimary">
+<div class="column w-full" [class.surface-card]="!message.isPrimary" [class.surface-200]="message.isPrimary">
   <div class="relative w-full">
     <div class="px-3 pb-7">
       <markdown

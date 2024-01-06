@@ -10,6 +10,7 @@ export class LayoutComponent {
   private displayService = inject(DisplayService);
 
   showSidebar$ = this.displayService.isSidebarVisible$;
+  nightMode$ = this.displayService.nightMode$;
 
   set showSidebar(value: boolean) {
     this.displayService.isSidebarVisible$.next(value);

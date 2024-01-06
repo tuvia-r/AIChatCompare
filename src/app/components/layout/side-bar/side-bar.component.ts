@@ -135,5 +135,9 @@ export class SideBarComponent {
   createChat() {
     if(this.chatsUtilsService.activeChat && this.chatsUtilsService.activeChat?.groups.length === 0) return;
     this.chatsUtilsService.newChat();
+
+    if(window.innerWidth < WINDOW_BREAKPOINT) {
+      this.displayService.isSidebarVisible$.next(false);
+    }
   }
 }

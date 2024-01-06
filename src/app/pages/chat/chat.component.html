@@ -13,11 +13,13 @@
               [message]="group.messageBySource['user']?.text ?? ''"
               [isLast]="i === messageGroups.length - 2"
               [disabled]="true"
+              class="surface-card border-round-2xl"
             ></ai-chat-chat-input>
             } @else {
             <ai-chat-chat-output-group
               [isLast]="i === messageGroups.length - 1"
               [messageGroup]="group"
+              class="surface-card border-round-2xl"
             ></ai-chat-chat-output-group>
             }
           </ng-container>

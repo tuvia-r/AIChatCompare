@@ -9,7 +9,8 @@
           [class.text-300]="(canCreateChat$ | async) === false"
           [class.text-600]="(canCreateChat$ | async) === true"
           [class.hover:text-primary-500]="(canCreateChat$ | async) === true"
-          class="pi pi-plus z-5"
+          class="pi pi-plus z-5 px-2"
+          pTooltip="Create new chat"
           (click)="
             $event.preventDefault();
             $event.stopPropagation();
